@@ -2,10 +2,12 @@ import os
 import json
 import pickle
 from collections import Counter
-import itertools
 
 # Global dictionary to store sublists based on file paths
-sublists_dict = {}
+date_to_metrics = {}
+# Dictionairy of packs to cards
+pack_to_cards = {}
+cards_to_pack = {}
 
 
 def process_file(file_path, encoding='utf-8'):
@@ -28,7 +30,7 @@ def process_file(file_path, encoding='utf-8'):
                 pass
 
     # Store the sub_list in the sublists_dict using the relative path as the key
-    sublists_dict[relative_path] = sub_list
+    date_to_metrics[relative_path] = sub_list
 
 
 def iterate_directory(directory, encoding='utf-8'):
@@ -40,7 +42,7 @@ def iterate_directory(directory, encoding='utf-8'):
 
 def save_data_to_json(filename):
     with open(filename, 'w', encoding='utf-8') as file:
-        json.dump(sublists_dict, file, indent=4)
+        json.dump(date_to_metrics, file, indent=4)
 
 
 def load_data_from_json(filename):
@@ -51,7 +53,7 @@ def load_data_from_json(filename):
 
 def save_data_to_pickle(filename):
     with open(filename, 'wb') as file:
-        pickle.dump(sublists_dict, file, protocol=pickle.HIGHEST_PROTOCOL)
+        pickle.dump(date_to_metrics, file, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 def load_data_from_pickle(filename):
@@ -91,6 +93,15 @@ def flatten_dict(input_dict):
             flat_list.append({key: value})
 
     return flat_list
+
+
+# To be used on the pack_to_cards dict to reverse it into cards to pack
+def reverse_and_flatten_dict(input_dict):
+    new_dict = {}
+    for key, values in input_dict.items():
+        for value in values:
+            new_dict[value] = key
+    return new_dict
 
 
 # Counts packs filtered at some point by each player.
@@ -249,10 +260,13 @@ if __name__ == "__main__":
 
     # Check if the data file exists to avoid reprocessing
     if os.path.exists(data_file_path):
-        sublists_dict = load_data_from_pickle(data_file_path)
-        sublists_dict2 = round_date_keys(sublists_dict, 0)
-        count_pack_victory_rate(sublists_dict2[""])
+        date_to_metrics = load_data_from_pickle(data_file_path)
     else:
         iterate_directory(metrics_path)
         save_data_to_pickle(data_file_path)
 
+    pack_to_cards = load_data_from_json(os.path.join(data_path, "packCards.json"))
+    cards_to_pack = reverse_and_flatten_dict(pack_to_cards)
+
+    all_data_dict = round_date_keys(date_to_metrics, 0)
+    count_pack_victory_rate(all_data_dict[""])
