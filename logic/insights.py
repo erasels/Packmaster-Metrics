@@ -185,3 +185,38 @@ def count_card_pick_rate(data_list, cards_to_pack):
 
     for choice, picked_count, not_picked_count, pick_rate in sorted_result:
         print(f"{cards_to_pack[choice]}:{choice}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
+
+
+def count_win_rates(data_list):
+    # Create a dictionary to store wins and total runs per ascension level
+    ascension_stats = {}
+    all_stats = {"wins": 0, "total_runs": 0}
+
+    for data_dict in data_list:
+        # Check if the dictionary contains a "victory" key
+        if "victory" in data_dict:
+            ascension_level = data_dict.get("ascension_level", 0)
+            victory = data_dict["victory"]
+
+            # Initialize the statistics for the ascension level if not already present
+            if ascension_level not in ascension_stats:
+                ascension_stats[ascension_level] = {"wins": 0, "total_runs": 0}
+
+            # Update statistics based on victory
+            ascension_stats[ascension_level]["total_runs"] += 1
+            all_stats["total_runs"] += 1
+            if victory:
+                ascension_stats[ascension_level]["wins"] += 1
+                all_stats["wins"] += 1
+
+    # Sort ascension levels in ascending order
+    sorted_ascension_levels = sorted(ascension_stats.keys(), key=lambda x: int(x))
+
+    print(f"Total win rate: {(all_stats['wins']/all_stats['total_runs']):.2%} ({all_stats['wins']}/{all_stats['total_runs']})")
+    # Calculate and print win rates per ascension level (sorted)
+    for ascension_level in sorted_ascension_levels:
+        stats = ascension_stats[ascension_level]
+        wins = stats["wins"]
+        total_runs = stats["total_runs"]
+        win_rate = wins / total_runs if total_runs > 0 else 0.0
+        print(f"Win rate on ascension {ascension_level}: {win_rate:.2%} ({wins}/{total_runs})")
