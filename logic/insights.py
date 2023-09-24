@@ -147,3 +147,41 @@ def count_pack_victory_rate(data_list):
         total_runs = pack_runs.get(pack, 0)
         victory_rate = wins / total_runs if total_runs > 0 else 0.0
         print(f"{pack}: {victory_rate:.2%} ({wins}/{total_runs})")
+
+
+# Count card picks of current run cards
+def count_card_pick_rate(data_list, cards_to_pack):
+    picked_counts = Counter()
+    not_picked_counts = Counter()
+    result = []
+
+    for data_dict in data_list:
+        current_packs = set(data_dict.get("currentPacks", "").split(","))
+        card_choices = data_dict.get("card_choices", [])
+        for choice in card_choices:
+            picked = choice.get("picked")
+            not_picked = choice.get("not_picked", [])
+
+            if picked and cards_to_pack.get(picked) in current_packs:
+                picked_counts.update([picked])
+
+            not_picked = [card for card in not_picked if cards_to_pack.get(card) in current_packs]
+            not_picked_counts.update(not_picked)
+
+    for choice, picked_count in picked_counts.items():
+        not_picked_count = not_picked_counts[choice]
+        total_count = picked_count + not_picked_count
+
+        # Calculate pick rate
+        if total_count > 0:
+            pick_rate = picked_count / total_count
+        else:
+            pick_rate = 0.0
+
+        result.append((choice, picked_count, not_picked_count, pick_rate))
+
+    # Sort the results by pick rate in descending order
+    sorted_result = sorted(result, key=lambda x: x[3], reverse=True)
+
+    for choice, picked_count, not_picked_count, pick_rate in sorted_result:
+        print(f"{cards_to_pack[choice]}:{choice}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")

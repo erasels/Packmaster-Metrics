@@ -24,4 +24,4 @@ if __name__ == "__main__":
     cards_to_pack = reverse_and_flatten_dict(pack_to_cards)
 
     all_data_dict = round_date_keys(date_to_metrics, 0)
-    insights.count_pack_victory_rate(all_data_dict[""])
+    insights.count_card_pick_rate(all_data_dict[""], cards_to_pack)
