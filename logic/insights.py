@@ -1,3 +1,4 @@
+import statistics
 from collections import Counter
 
 
@@ -212,7 +213,8 @@ def count_win_rates(data_list):
     # Sort ascension levels in ascending order
     sorted_ascension_levels = sorted(ascension_stats.keys(), key=lambda x: int(x))
 
-    print(f"Total win rate: {(all_stats['wins']/all_stats['total_runs']):.2%} ({all_stats['wins']}/{all_stats['total_runs']})")
+    print(
+        f"Total win rate: {(all_stats['wins'] / all_stats['total_runs']):.2%} ({all_stats['wins']}/{all_stats['total_runs']})")
     # Calculate and print win rates per ascension level (sorted)
     for ascension_level in sorted_ascension_levels:
         stats = ascension_stats[ascension_level]
@@ -220,3 +222,35 @@ def count_win_rates(data_list):
         total_runs = stats["total_runs"]
         win_rate = wins / total_runs if total_runs > 0 else 0.0
         print(f"Win rate on ascension {ascension_level}: {win_rate:.2%} ({wins}/{total_runs})")
+
+
+def count_median_deck_sizes(data_list):
+    # Create a dictionary to store deck sizes of victorious runs per ascension level
+    ascension_deck_sizes = {}
+    total_deck_sizes = []
+
+    for data_dict in data_list:
+        # Check if the dictionary contains a "victory" key and it's True
+        if data_dict.get("victory", False):
+            ascension_level = data_dict.get("ascension_level", "Unknown")
+            master_deck = data_dict.get("master_deck", [])
+            deck_size = len(master_deck)
+
+            # Initialize the list for the ascension level if not already present
+            if ascension_level not in ascension_deck_sizes:
+                ascension_deck_sizes[ascension_level] = []
+
+            ascension_deck_sizes[ascension_level].append(deck_size)
+            total_deck_sizes.append(deck_size)
+
+    # Sort ascension levels, handling "Unknown" by using a default value for sorting
+    sorted_ascension_levels = sorted(
+        ascension_deck_sizes.keys(),
+        key=lambda x: int(x) if x != "Unknown" else float("inf")
+    )
+
+    print(f"Median deck size for any ascension: {statistics.median(total_deck_sizes)}")
+    # Calculate and print median deck size per ascension level (sorted)
+    for ascension_level in sorted_ascension_levels:
+        median_size = statistics.median(ascension_deck_sizes[ascension_level])
+        print(f"Median deck size for ascension {ascension_level}: {median_size}")
