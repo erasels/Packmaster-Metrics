@@ -340,3 +340,47 @@ def count_win_rate_per_picked_hat(data_list):
         total_runs = stats["total_runs"]
         win_rate = wins / total_runs if total_runs > 0 else 0.0
         print(f"{picked_hat}: {win_rate:.2%} ({wins}/{total_runs})")
+
+
+def count_median_turn_length_per_enemy(data_list, high_value_threshold=200):
+    # Create a dictionary to store the turn lengths for each enemy
+    enemy_turn_lengths = {}
+
+    for data_dict in data_list:
+        # Check if the dictionary contains the "damage_taken" key
+        if "damage_taken" in data_dict:
+            damage_taken = data_dict["damage_taken"]
+
+            for entry in damage_taken:
+                enemy = entry.get("enemies", "")
+                turns = entry.get("turns", 0)
+
+                # Initialize the enemy's turn lengths list if not already present
+                if enemy not in enemy_turn_lengths:
+                    enemy_turn_lengths[enemy] = []
+
+                # Append the turn length to the enemy's list
+                enemy_turn_lengths[enemy].append(turns)
+
+    sorted_results = sorted(
+        enemy_turn_lengths.items(),
+        key=lambda x: statistics.median(x[1]),
+        reverse=True,)
+
+    low_value_results = []
+    high_value_results = []
+
+    for stat in sorted_results:
+        if len(enemy_turn_lengths[stat[0]]) < high_value_threshold:
+            low_value_results.append(stat)
+        else:
+            high_value_results.append(stat)
+
+    # Calculate and print the median turn length per enemy
+    for enemy, turn_lengths in high_value_results:
+        median_turn_length = statistics.median(turn_lengths)
+        print(f"{enemy}: {median_turn_length} turns (from {len(turn_lengths)} fights)")
+    print(f"---- The following results have less than {high_value_threshold} recorded combats ----")
+    for enemy, turn_lengths in low_value_results:
+        median_turn_length = statistics.median(turn_lengths)
+        print(f"{enemy}: {median_turn_length} turns (from {len(turn_lengths)} fights)")
