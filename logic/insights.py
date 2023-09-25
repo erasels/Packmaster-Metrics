@@ -254,3 +254,55 @@ def count_median_deck_sizes(data_list):
     for ascension_level in sorted_ascension_levels:
         median_size = statistics.median(ascension_deck_sizes[ascension_level])
         print(f"Median deck size for ascension {ascension_level}: {median_size}")
+
+
+def count_average_win_rate_per_card(data_list, cards_to_pack):
+    # Create a dictionary to store the number of wins and total runs for each card
+    card_stats = {}
+
+    for data_dict in data_list:
+        # Check if the dictionary contains both "master_deck" and "victory" keys
+        if "master_deck" in data_dict and "victory" in data_dict:
+            master_deck = data_dict["master_deck"]
+            victory = data_dict["victory"]
+
+            for card in master_deck:
+                if card not in card_stats:
+                    card_stats[card] = {"wins": 0, "total_runs": 0}
+
+                # Update statistics based on victory
+                card_stats[card]["total_runs"] += 1
+                if victory:
+                    card_stats[card]["wins"] += 1
+
+    sorted_card_stats = sorted(card_stats.items(), key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0), reverse=True)
+
+    cards_with_200_runs_or_more = []
+    cards_with_less_than_200_runs = []
+
+    for card, stats in sorted_card_stats:
+        total_runs = stats["total_runs"]
+        if total_runs >= 200:
+            cards_with_200_runs_or_more.append((card, stats))
+        else:
+            cards_with_less_than_200_runs.append((card, stats))
+
+    # Sort the cards with at least 200 total runs by win rate
+    sorted_cards_with_200_runs_or_more = sorted(
+        cards_with_200_runs_or_more,
+        key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0),
+        reverse=True,
+    )
+
+    # Combine and print the results
+    sorted_results = sorted_cards_with_200_runs_or_more + cards_with_less_than_200_runs
+
+    # Calculate and print the average win rate for each card
+    for card, stats in sorted_results:
+        if cards_to_pack.get(card):
+            pack = cards_to_pack[card].replace("Pack", "").replace("anniv5:", "")
+            card = card.replace("anniv5:", "")
+            wins = stats["wins"]
+            total_runs = stats["total_runs"]
+            average_win_rate = wins / total_runs if total_runs > 0 else 0.0
+            print(f"{pack}:{card}: {average_win_rate:.2%} ({wins}/{total_runs})")
