@@ -275,7 +275,9 @@ def count_average_win_rate_per_card(data_list, cards_to_pack):
                 if victory:
                     card_stats[card]["wins"] += 1
 
-    sorted_card_stats = sorted(card_stats.items(), key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0), reverse=True)
+    sorted_card_stats = sorted(card_stats.items(),
+                               key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0),
+                               reverse=True)
 
     cards_with_200_runs_or_more = []
     cards_with_less_than_200_runs = []
@@ -306,3 +308,35 @@ def count_average_win_rate_per_card(data_list, cards_to_pack):
             total_runs = stats["total_runs"]
             average_win_rate = wins / total_runs if total_runs > 0 else 0.0
             print(f"{pack}:{card}: {average_win_rate:.2%} ({wins}/{total_runs})")
+
+
+# This is bogus data for fun
+def count_win_rate_per_picked_hat(data_list):
+    # Create a dictionary to store the number of wins and total runs for each pickedHat
+    picked_hat_stats = {}
+
+    for data_dict in data_list:
+        # Check if the dictionary contains both "pickedHat" and "victory" keys
+        if "pickedHat" in data_dict and "victory" in data_dict:
+            picked_hat = data_dict["pickedHat"]
+            victory = data_dict["victory"]
+
+            # Initialize the pickedHat's statistics if not already present
+            if picked_hat not in picked_hat_stats:
+                picked_hat_stats[picked_hat] = {"wins": 0, "total_runs": 0}
+
+            # Update statistics based on victory
+            picked_hat_stats[picked_hat]["total_runs"] += 1
+            if victory:
+                picked_hat_stats[picked_hat]["wins"] += 1
+
+    sorted_results = sorted(picked_hat_stats.items(),
+                            key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0),
+                            reverse=True)
+
+    # Calculate and print the win rate for each pickedHat
+    for picked_hat, stats in sorted_results:
+        wins = stats["wins"]
+        total_runs = stats["total_runs"]
+        win_rate = wins / total_runs if total_runs > 0 else 0.0
+        print(f"{picked_hat}: {win_rate:.2%} ({wins}/{total_runs})")
