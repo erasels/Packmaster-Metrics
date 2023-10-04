@@ -1,5 +1,7 @@
 import statistics
 from collections import Counter
+from itertools import combinations
+from collections import defaultdict
 
 
 # Counts packs filtered at some point by each player.
@@ -365,7 +367,7 @@ def count_median_turn_length_per_enemy(data_list, high_value_threshold=200):
     sorted_results = sorted(
         enemy_turn_lengths.items(),
         key=lambda x: statistics.median(x[1]),
-        reverse=True,)
+        reverse=True, )
 
     low_value_results = []
     high_value_results = []
@@ -384,3 +386,46 @@ def count_median_turn_length_per_enemy(data_list, high_value_threshold=200):
     for enemy, turn_lengths in low_value_results:
         median_turn_length = statistics.median(turn_lengths)
         print(f"{enemy}: {median_turn_length} turns (from {len(turn_lengths)} fights)")
+
+
+# Turned out kind of useless, since popular packs have a heavy influence on this output. Prints the frequency of the pair and the total win rate with that pair in the deck.
+def card_synergy_analysis(runs):
+    # Counting the frequency of each card pair in winning runs
+    pair_counts = defaultdict(int)
+    total_winning_runs = 0
+
+    unwanted_prefixes = ["anniv5:"]
+    cards_to_clean = ["Rummage", "Cardistry", "Strike", "Defend", "AscendersBane"]
+
+    for run in runs:
+        if run.get('victory', False):
+            total_winning_runs += 1
+            # Extracting the cards from masterDeck and removing the +number suffix
+            cards = [card.split('+')[0] for card in run['master_deck']]
+            # Removing unwanted prefixes from all cards
+            cards = [card.replace(prefix, "") for card in cards for prefix in unwanted_prefixes]
+            # Removing unwanted cards from the dataset
+            cards = [card for card in cards if card not in cards_to_clean]
+            # Ensuring each card is unique for the current run
+            cards = list(set(cards))
+
+            for combo in combinations(cards, 2):
+                # Sorting to ensure (CardA, CardB) is the same as (CardB, CardA)
+                sorted_combo = tuple(sorted(combo))
+                pair_counts[sorted_combo] += 1
+
+    # Analyzing card pairs
+    synergy_data = {}
+    for pair, count in pair_counts.items():
+        win_rate = (count / total_winning_runs) * 100
+        synergy_data[pair] = {
+            'frequency': count,
+            'win_rate': win_rate
+        }
+
+    # Sorting card pairs by win rate for better insight
+    sorted_synergy_data = dict(sorted(synergy_data.items(), key=lambda item: item[1]['win_rate'], reverse=True))
+
+    for index, (cards, count_data) in enumerate(sorted_synergy_data.items()):
+        if count_data['frequency'] >= 800:
+            print(f"{index + 1}. {cards[0]} and {cards[1]}: Frequency - {count_data['frequency']}, Win Rate - {count_data['win_rate']:.2f}%")
