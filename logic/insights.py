@@ -152,7 +152,7 @@ def count_pack_victory_rate(data_list):
 
 
 # Count card picks of current run cards (counts upgraded cards seperately)
-def count_card_pick_rate(data_list, cards_to_pack):
+def count_card_pick_rate(data_list, card_to_pack):
     picked_counts = Counter()
     not_picked_counts = Counter()
     result = []
@@ -164,10 +164,10 @@ def count_card_pick_rate(data_list, cards_to_pack):
             picked = choice.get("picked")
             not_picked = choice.get("not_picked", [])
 
-            if picked and cards_to_pack.get(picked) in current_packs:
+            if picked and card_to_pack.get(picked) in current_packs:
                 picked_counts.update([picked])
 
-            not_picked = [card for card in not_picked if cards_to_pack.get(card) in current_packs]
+            not_picked = [card for card in not_picked if card_to_pack.get(card) in current_packs]
             not_picked_counts.update(not_picked)
 
     for choice, picked_count in picked_counts.items():
@@ -186,7 +186,7 @@ def count_card_pick_rate(data_list, cards_to_pack):
     sorted_result = sorted(result, key=lambda x: x[3], reverse=True)
 
     for choice, picked_count, not_picked_count, pick_rate in sorted_result:
-        print(f"{add_pack_prefix(choice, cards_to_pack)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
+        print(f"{add_pack_prefix(choice, card_to_pack)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
 
 
 def count_win_rates(data_list):
@@ -256,7 +256,7 @@ def count_median_deck_sizes(data_list):
         print(f"Median deck size for ascension {ascension_level}: {median_size}")
 
 
-def count_average_win_rate_per_card(data_list, cards_to_pack):
+def count_average_win_rate_per_card(data_list, card_to_pack):
     # Create a dictionary to store the number of wins and total runs for each card
     card_stats = {}
 
@@ -301,10 +301,10 @@ def count_average_win_rate_per_card(data_list, cards_to_pack):
 
     # Calculate and print the average win rate for each card
     for card, stats in sorted_results:
-        if cards_to_pack.get(card):
+        if card_to_pack.get(card):
             wins = stats["wins"]
             total_runs = stats["total_runs"]
-            print(f"{add_pack_prefix(card, cards_to_pack)}: {make_ratio(wins, total_runs)}")
+            print(f"{add_pack_prefix(card, card_to_pack)}: {make_ratio(wins, total_runs)}")
 
 
 # This is bogus data for fun
@@ -420,3 +420,43 @@ def card_synergy_analysis(runs):
     for index, (cards, count_data) in enumerate(sorted_synergy_data.items()):
         if count_data['frequency'] >= 800:
             print(f"{index + 1}. {cards[0]} and {cards[1]}: Frequency - {count_data['frequency']}, Win Rate - {count_data['win_rate']:.2f}%")
+
+
+def pack_efficiency_analysis(runs, card_to_pack):
+    pack_counts = defaultdict(int)
+    pack_win_counts = defaultdict(int)
+
+    for run in runs:
+        # Dictionary to keep track of cards from each pack in the current run
+        run_pack_counts = defaultdict(int)
+
+        for card in run['master_deck']:
+            # Get the card's pack
+            clean_card = del_upg(card)
+            pack_name = card_to_pack.get(clean_card)
+
+            if not pack_name:  # Skip cards that can't be associated with a pack
+                continue
+
+            # Increment the count for this pack for the current run
+            run_pack_counts[pack_name] += 1
+
+        # Update the global pack counts with the counts from this run
+        for pack, count in run_pack_counts.items():
+            pack_counts[pack] += count
+            if run.get('victory', False):
+                pack_win_counts[pack] += count
+
+    # Calculate the win rates
+    pack_win_rates = {}
+    for pack, count in pack_counts.items():
+        win_count = pack_win_counts.get(pack, 0)
+        pack_win_rates[pack] = (win_count / count if count > 0 else 0.0, make_ratio(win_count, count))
+
+    # Sort packs by win rate
+    sorted_packs = sorted(pack_win_rates.items(), key=lambda x: x[1][0], reverse=True)
+
+    # Display results
+    for pack, (win_rate_percentage, win_rate_str) in sorted_packs:
+        print(f"{del_prefix(pack)}: {win_rate_str}")
+

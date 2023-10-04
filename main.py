@@ -5,7 +5,7 @@ from logic.storage import *
 date_to_metrics = {}
 # Dictionairy of packs to cards
 pack_to_cards = {}
-cards_to_pack = {}
+card_to_pack = {}
 
 if __name__ == "__main__":
     data_path = os.path.join(os.getcwd(), "data")
@@ -21,7 +21,7 @@ if __name__ == "__main__":
         save_data_to_pickle(data_file_path, date_to_metrics)
 
     pack_to_cards = load_data_from_json(os.path.join(data_path, "packCards.json"))
-    cards_to_pack = reverse_and_flatten_dict(pack_to_cards)
+    card_to_pack = reverse_and_flatten_dict(pack_to_cards)
 
     all_data_dict = round_date_keys(date_to_metrics, 0)
-    insights.count_average_win_rate_per_card(all_data_dict[""], cards_to_pack)
+    insights.pack_efficiency_analysis(all_data_dict[""], card_to_pack)
