@@ -2,6 +2,7 @@ import statistics
 from collections import Counter
 from itertools import combinations
 from collections import defaultdict
+from logic.transformations import *
 
 
 # Counts packs filtered at some point by each player.
@@ -29,7 +30,7 @@ def sum_filtered_packs(data_list):
         host_word_counts[host].update(new_words)
 
     for word, count in word_counts.most_common():
-        print(f"{word}: {count}")
+        print(f"{del_prefix(word)}: {count}")
 
 
 # Counts how many runs were with enabledExpansionPacks out of the total runs
@@ -62,8 +63,7 @@ def count_enabled_expansion_packs_per_host(data_list):
     print(f"{sum(host_count.values())}/{len(host_count)}")
 
 
-# Count pack picks
-def count_picked_and_not_picked(data_list):
+def count_pack_picks(data_list):
     picked_counts = Counter()
     not_picked_counts = Counter()
     result = []
@@ -96,7 +96,7 @@ def count_picked_and_not_picked(data_list):
     sorted_result = sorted(result, key=lambda x: x[3], reverse=True)
 
     for choice, picked_count, not_picked_count, pick_rate in sorted_result:
-        print(f"{choice}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
+        print(f"{del_prefix(choice)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
 
 
 def count_most_common_players(data_list):
@@ -123,7 +123,7 @@ def count_most_common_picked_hats(data_list):
             picked_hat_counts[picked_hat] += 1
 
     for picked_hat, count in picked_hat_counts.most_common():
-        print(f"{picked_hat}: {count}")
+        print(f"{del_prefix(picked_hat)}: {count}")
 
 
 def count_pack_victory_rate(data_list):
@@ -152,7 +152,7 @@ def count_pack_victory_rate(data_list):
         print(f"{pack}: {victory_rate:.2%} ({wins}/{total_runs})")
 
 
-# Count card picks of current run cards
+# Count card picks of current run cards (counts upgraded cards seperately)
 def count_card_pick_rate(data_list, cards_to_pack):
     picked_counts = Counter()
     not_picked_counts = Counter()
@@ -187,7 +187,7 @@ def count_card_pick_rate(data_list, cards_to_pack):
     sorted_result = sorted(result, key=lambda x: x[3], reverse=True)
 
     for choice, picked_count, not_picked_count, pick_rate in sorted_result:
-        print(f"{cards_to_pack[choice]}:{choice}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
+        print(f"{add_pack_prefix(choice, cards_to_pack)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
 
 
 def count_win_rates(data_list):
@@ -265,7 +265,7 @@ def count_average_win_rate_per_card(data_list, cards_to_pack):
     for data_dict in data_list:
         # Check if the dictionary contains both "master_deck" and "victory" keys
         if "master_deck" in data_dict and "victory" in data_dict:
-            master_deck = data_dict["master_deck"]
+            master_deck = [card.split('+')[0] for card in data_dict['master_deck']]
             victory = data_dict["victory"]
 
             for card in master_deck:
@@ -304,12 +304,10 @@ def count_average_win_rate_per_card(data_list, cards_to_pack):
     # Calculate and print the average win rate for each card
     for card, stats in sorted_results:
         if cards_to_pack.get(card):
-            pack = cards_to_pack[card].replace("Pack", "").replace("anniv5:", "")
-            card = card.replace("anniv5:", "")
             wins = stats["wins"]
             total_runs = stats["total_runs"]
             average_win_rate = wins / total_runs if total_runs > 0 else 0.0
-            print(f"{pack}:{card}: {average_win_rate:.2%} ({wins}/{total_runs})")
+            print(f"{add_pack_prefix(card, cards_to_pack)}: {average_win_rate:.2%} ({wins}/{total_runs})")
 
 
 # This is bogus data for fun
@@ -341,7 +339,7 @@ def count_win_rate_per_picked_hat(data_list):
         wins = stats["wins"]
         total_runs = stats["total_runs"]
         win_rate = wins / total_runs if total_runs > 0 else 0.0
-        print(f"{picked_hat}: {win_rate:.2%} ({wins}/{total_runs})")
+        print(f"{del_prefix(picked_hat)}: {win_rate:.2%} ({wins}/{total_runs})")
 
 
 def count_median_turn_length_per_enemy(data_list, high_value_threshold=200):
