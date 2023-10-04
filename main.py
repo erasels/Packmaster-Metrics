@@ -17,7 +17,7 @@ if __name__ == "__main__":
     if os.path.exists(data_file_path):
         date_to_metrics = load_data_from_pickle(data_file_path)
     else:
-        iterate_directory(metrics_path)
+        iterate_directory(metrics_path, date_to_metrics)
         save_data_to_pickle(data_file_path, date_to_metrics)
 
     pack_to_cards = load_data_from_json(os.path.join(data_path, "packCards.json"))

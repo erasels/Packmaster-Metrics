@@ -26,11 +26,11 @@ def process_file(file_path, data, encoding='utf-8'):
     data[relative_path] = sub_list
 
 
-def iterate_directory(directory, encoding='utf-8'):
+def iterate_directory(directory, data, encoding='utf-8'):
     for root, _, files in os.walk(directory):
         for file in files:
             file_path = os.path.join(root, file)
-            process_file(file_path, encoding)
+            process_file(file_path, data, encoding)
 
 
 def save_data_to_json(filename, data):
