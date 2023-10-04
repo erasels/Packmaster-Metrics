@@ -15,3 +15,7 @@ def add_pack_prefix(cardName: str, cards_to_packs: dict, keep_upgrade: bool = Tr
         return new_prefix + del_prefix(del_upg(cardName))
     return new_prefix + del_prefix(cardName)
 
+
+def make_ratio(positive: int, total: int) -> str:
+    rate = positive / total if total > 0 else 0.0
+    return f"{rate:.2%} ({positive}/{total})"

@@ -42,7 +42,7 @@ def count_enabled_expansion_packs(data_list):
         if data_dict.get("enabledExpansionPacks"):
             enabled_count += 1
 
-    print(f"{enabled_count}/{total_count}")
+    print(make_ratio(enabled_count, total_count))
 
 
 def count_enabled_expansion_packs_per_host(data_list):
@@ -148,8 +148,7 @@ def count_pack_victory_rate(data_list):
     for pack in sorted_packs:
         wins = pack_wins[pack]
         total_runs = pack_runs.get(pack, 0)
-        victory_rate = wins / total_runs if total_runs > 0 else 0.0
-        print(f"{pack}: {victory_rate:.2%} ({wins}/{total_runs})")
+        print(f"{del_prefix(pack)}: {make_ratio(wins, total_runs)}")
 
 
 # Count card picks of current run cards (counts upgraded cards seperately)
@@ -216,14 +215,13 @@ def count_win_rates(data_list):
     sorted_ascension_levels = sorted(ascension_stats.keys(), key=lambda x: int(x))
 
     print(
-        f"Total win rate: {(all_stats['wins'] / all_stats['total_runs']):.2%} ({all_stats['wins']}/{all_stats['total_runs']})")
+        f"Total win rate: {make_ratio(all_stats['wins'], all_stats['total_runs'])}")
     # Calculate and print win rates per ascension level (sorted)
     for ascension_level in sorted_ascension_levels:
         stats = ascension_stats[ascension_level]
         wins = stats["wins"]
         total_runs = stats["total_runs"]
-        win_rate = wins / total_runs if total_runs > 0 else 0.0
-        print(f"Win rate on ascension {ascension_level}: {win_rate:.2%} ({wins}/{total_runs})")
+        print(f"Win rate on ascension {ascension_level}: {make_ratio(wins, total_runs)}")
 
 
 def count_median_deck_sizes(data_list):
@@ -306,8 +304,7 @@ def count_average_win_rate_per_card(data_list, cards_to_pack):
         if cards_to_pack.get(card):
             wins = stats["wins"]
             total_runs = stats["total_runs"]
-            average_win_rate = wins / total_runs if total_runs > 0 else 0.0
-            print(f"{add_pack_prefix(card, cards_to_pack)}: {average_win_rate:.2%} ({wins}/{total_runs})")
+            print(f"{add_pack_prefix(card, cards_to_pack)}: {make_ratio(wins, total_runs)}")
 
 
 # This is bogus data for fun
@@ -338,8 +335,7 @@ def count_win_rate_per_picked_hat(data_list):
     for picked_hat, stats in sorted_results:
         wins = stats["wins"]
         total_runs = stats["total_runs"]
-        win_rate = wins / total_runs if total_runs > 0 else 0.0
-        print(f"{del_prefix(picked_hat)}: {win_rate:.2%} ({wins}/{total_runs})")
+        print(f"{del_prefix(picked_hat)}: {make_ratio(wins, total_runs)}")
 
 
 def count_median_turn_length_per_enemy(data_list, high_value_threshold=200):
@@ -392,16 +388,13 @@ def card_synergy_analysis(runs):
     pair_counts = defaultdict(int)
     total_winning_runs = 0
 
-    unwanted_prefixes = ["anniv5:"]
     cards_to_clean = ["Rummage", "Cardistry", "Strike", "Defend", "AscendersBane"]
 
     for run in runs:
         if run.get('victory', False):
             total_winning_runs += 1
-            # Extracting the cards from masterDeck and removing the +number suffix
-            cards = [card.split('+')[0] for card in run['master_deck']]
-            # Removing unwanted prefixes from all cards
-            cards = [card.replace(prefix, "") for card in cards for prefix in unwanted_prefixes]
+            # Remove upgrade and prefix from cards
+            cards = [del_prefix(del_upg(card)) for card in run['master_deck']]
             # Removing unwanted cards from the dataset
             cards = [card for card in cards if card not in cards_to_clean]
             # Ensuring each card is unique for the current run
