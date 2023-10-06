@@ -2,6 +2,8 @@ import statistics
 from collections import Counter
 from itertools import combinations
 from collections import defaultdict
+from typing import List, Dict
+
 from logic.transformations import *
 
 
@@ -188,7 +190,8 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict) -> None:
     sorted_result = sorted(result, key=lambda x: x[3], reverse=True)
 
     for choice, picked_count, not_picked_count, pick_rate in sorted_result:
-        print(f"{add_pack_prefix(choice, card_to_pack)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
+        print(
+            f"{add_pack_prefix(choice, card_to_pack)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
 
 
 def count_win_rates(runs: list[dict]) -> None:
@@ -422,7 +425,8 @@ def card_synergy_analysis(runs: list[dict]) -> None:
 
     for index, (cards, count_data) in enumerate(sorted_synergy_data.items()):
         if count_data['frequency'] >= 800:
-            print(f"{index + 1}. {cards[0]} and {cards[1]}: Frequency - {count_data['frequency']}, Win Rate - {count_data['win_rate']:.2f}%")
+            print(
+                f"{index + 1}. {cards[0]} and {cards[1]}: Frequency - {count_data['frequency']}, Win Rate - {count_data['win_rate']:.2f}%")
 
 
 # Analyzes the efficiency of packs based on the win rates of runs containing cards from those packs.
@@ -464,3 +468,98 @@ def pack_efficiency_analysis(runs: list[dict], card_to_pack: dict) -> None:
     for pack, (win_rate_percentage, win_rate_str) in sorted_packs:
         print(f"{del_prefix(pack)}: {win_rate_str}")
 
+
+def count_upgraded_cards(runs: list[dict]) -> dict:
+    card_upgrade_counts = defaultdict(int)
+
+    for run in runs:
+        for choice in run.get("campfire_choices", []):
+            if choice["key"] == "SMITH":
+                card_name = del_prefix(choice["data"])
+                card_upgrade_counts[card_name] += 1
+
+    # Sort the cards by their upgrade frequency
+    sorted_upgrade_counts = dict(sorted(card_upgrade_counts.items(), key=lambda item: item[1], reverse=True))
+
+    return sorted_upgrade_counts
+
+
+def upgraded_card_win_rate_analysis(runs: list[dict]) -> dict:
+    frequently_upgraded = count_upgraded_cards(runs)
+
+    # Count the number of runs where the card was upgraded and won
+    upgrade_win_counts = defaultdict(int)
+    upgrade_total_counts = defaultdict(int)
+
+    # Count the number of runs where the card was present and won
+    card_win_counts = defaultdict(int)
+    card_total_counts = defaultdict(int)
+
+    for run in runs:
+        cards = [del_prefix(del_upg(card)) for card in run['master_deck']]
+        upgraded_cards = [del_prefix(choice["data"]) for choice in run.get("campfire_choices", []) if
+                          choice["key"] == "SMITH"]
+
+        for card in cards:
+            card_total_counts[card] += 1
+            if run.get('victory', False):
+                card_win_counts[card] += 1
+
+        for upgraded_card in upgraded_cards:
+            upgrade_total_counts[upgraded_card] += 1
+            if run.get('victory', False):
+                upgrade_win_counts[upgraded_card] += 1
+
+    analysis = {}
+    for card, freq in frequently_upgraded.items():
+        upgrade_win_rate = make_ratio(upgrade_win_counts[card], upgrade_total_counts[card])
+        general_win_rate = make_ratio(card_win_counts[card], card_total_counts[card])
+        analysis[card] = {
+            "upgrade_frequency": freq,
+            "upgrade_win_rate": upgrade_win_rate,
+            "general_win_rate": general_win_rate
+        }
+
+    # Sorting by upgrade frequency for better insight
+    sorted_analysis = dict(sorted(analysis.items(), key=lambda item: item[1]['upgrade_frequency'], reverse=True))
+
+    for card, stats in sorted_analysis.items():
+        if stats['upgrade_frequency'] < 350:
+            continue
+        print(f"{card}: Upgraded {stats['upgrade_frequency']} times")
+        print(f"\tWin Rate when upgraded: {stats['upgrade_win_rate']}")
+        print(f"\tGeneral Win Rate: {stats['general_win_rate']}\n")
+
+    return sorted_analysis
+
+
+def median_health_before_rest(runs: List[Dict[str, any]]) -> Dict[int, float]:
+    # Dictionary to hold health values for each ascension level
+    ascension_healths = defaultdict(list)
+    overall_health_ratios = []  # Track health ratios across all ascensions
+
+    for run in runs:
+        ascension = run['ascension_level']
+        for choice in run['campfire_choices']:
+            if choice['key'] == 'REST':
+                floor_index = int(choice['floor'])
+                if len(run['current_hp_per_floor']) > floor_index and len(run['max_hp_per_floor']) > floor_index:
+                    current_health = run['current_hp_per_floor'][floor_index]
+                    max_health = run['max_hp_per_floor'][floor_index]
+                    health_ratio = current_health / max_health if max_health > 0 else 0
+                    ascension_healths[ascension].append(health_ratio)
+                    overall_health_ratios.append(health_ratio)
+
+    # Compute median health ratio for each ascension
+    median_healths = {ascension: statistics.median(health_ratios) for ascension, health_ratios in ascension_healths.items()}
+
+    # Compute and print overall median
+    overall_median = statistics.median(overall_health_ratios)
+    print(f"Overall Median Health Ratio Before Rest: {overall_median:.2%}")
+
+    # Print results for each ascension, sorted
+    for ascension in sorted(median_healths.keys()):
+        health_ratio = median_healths[ascension]
+        print(f"Ascension {ascension}: Median Health Ratio Before Rest: {health_ratio:.2%}")
+
+    return median_healths

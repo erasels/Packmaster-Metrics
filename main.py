@@ -24,4 +24,4 @@ if __name__ == "__main__":
     card_to_pack = reverse_and_flatten_dict(pack_to_cards)
 
     all_data_dict = round_date_keys(date_to_metrics, 0)
-    insights.pack_efficiency_analysis(all_data_dict[""], card_to_pack)
+    insights.median_health_before_rest(all_data_dict[""])
