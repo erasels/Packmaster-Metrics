@@ -2,7 +2,7 @@ import statistics
 from collections import Counter
 from itertools import combinations
 from collections import defaultdict
-from typing import List, Dict
+from typing import List, Dict, Tuple
 
 from logic.transformations import *
 
@@ -563,3 +563,30 @@ def median_health_before_rest(runs: List[Dict[str, any]]) -> Dict[int, float]:
         print(f"Ascension {ascension}: Median Health Ratio Before Rest: {health_ratio:.2%}")
 
     return median_healths
+
+
+def smith_vs_rest_ratio(runs: List[Dict[str, any]]) -> Dict[int, Tuple[int, int]]:
+    # Dictionary to hold count of 'SMITH' and 'REST' choices for each ascension level
+    ascension_choices = defaultdict(lambda: {'SMITH': 0, 'REST': 0})
+    overall_choices = {'SMITH': 0, 'REST': 0}  # Track overall 'SMITH' and 'REST' choices
+
+    for run in runs:
+        ascension = run['ascension_level']
+        for choice in run['campfire_choices']:
+            if choice['key'] in ['SMITH', 'REST']:
+                ascension_choices[ascension][choice['key']] += 1
+                overall_choices[choice['key']] += 1
+
+    # Compute and print overall ratio
+    overall_ratio = overall_choices['SMITH'] / overall_choices['REST'] if overall_choices['REST'] > 0 else 0
+    print(
+        f"Overall Smith to Rest Ratio: {overall_ratio:.2f} ({overall_choices['SMITH']} Smiths / {overall_choices['REST']} Rests)")
+
+    # Compute and print ratio for each ascension, sorted
+    for ascension in sorted(ascension_choices.keys()):
+        choices = ascension_choices[ascension]
+        ratio = choices['SMITH'] / choices['REST'] if choices['REST'] > 0 else 0
+        print(
+            f"Ascension {ascension}: Smith to Rest Ratio: {ratio:.2f} ({choices['SMITH']} Smiths / {choices['REST']} Rests)")
+
+    return ascension_choices
