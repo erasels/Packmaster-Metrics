@@ -3,9 +3,10 @@ import os
 import pickle
 
 
-def process_file(file_path, data, encoding='utf-8'):
+def process_file(directory, file_path, encoding='utf-8'):
+    data = {}
     # Create a sub list based on the path of the file from the working directory
-    relative_path = os.path.relpath(file_path, start=os.getcwd()).replace('\\', '/')
+    relative_path = os.path.relpath(file_path, start=directory).replace('\\', '/')
     sub_list = []
 
     # Open and read the file line by line
@@ -13,10 +14,10 @@ def process_file(file_path, data, encoding='utf-8'):
         for index, line in enumerate(file):
             try:
                 # Parse each line as JSON and convert it into a dictionary
-                data = json.loads(line)
-                event = data['event']
-                event['host'] = data.get('host', '')
-                event['time'] = data.get('time', '')
+                run = json.loads(line)
+                event = run['event']
+                event['host'] = run.get('host', '')
+                event['time'] = run.get('time', '')
                 sub_list.append(event)
             except json.JSONDecodeError:
                 print(f"{index} line in {file_path} is not valid JSON. Skipped it.")
@@ -24,13 +25,17 @@ def process_file(file_path, data, encoding='utf-8'):
 
     # Store the sub_list in the sublists_dict using the relative path as the key
     data[relative_path] = sub_list
+    return data
 
 
-def iterate_directory(directory, data, encoding='utf-8'):
+def iterate_directory(directory, encoding='utf-8'):
+    data = {}
     for root, _, files in os.walk(directory):
         for file in files:
             file_path = os.path.join(root, file)
-            process_file(file_path, data, encoding)
+            data.update(process_file(directory, file_path, encoding))
+
+    return data
 
 
 def save_data_to_json(filename, data):
