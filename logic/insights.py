@@ -710,3 +710,266 @@ def card_gem_synergies(runs: List[Dict[str, Any]]) -> Dict[str, int]:
     print("\n")
 
     return sorted_results
+
+
+def win_rate_by_ascension_and_pack(runs: List[Dict[str, Any]]) -> Dict[str, Dict[int, str]]:
+    stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
+
+    for run in runs:
+        asc_level = run.get('ascension_level', 0)
+        packs = run.get('currentPacks', '').split(',')
+        victory = run.get('victory', False)
+
+        for pack in packs:
+            stats[pack][asc_level]['total'] += 1
+            if victory:
+                stats[pack][asc_level]['wins'] += 1
+
+    win_rate_by_pack = defaultdict(dict)
+
+    for pack, asc_data in stats.items():
+        for asc_level, data in asc_data.items():
+            win_rate = make_ratio(data['wins'], data['total'])
+            win_rate_by_pack[pack][asc_level] = win_rate
+
+    # Print the results
+    for pack, asc_data in win_rate_by_pack.items():
+        print(f"Pack: {del_prefix(pack)}")
+        for asc_level in range(0, 21):
+            if asc_level in asc_data:
+                print(f"Ascension {asc_level}: {asc_data[asc_level]}")
+        print("\n")
+
+    return win_rate_by_pack
+
+
+def win_rate_deviation_by_ascension_and_pack(runs: List[Dict[str, Any]]) -> Dict[str, Dict[int, str]]:
+    stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
+
+    for run in runs:
+        asc_level = run.get('ascension_level', 0)
+        packs = run.get('currentPacks', '').split(',')
+        victory = run.get('victory', False)
+
+        for pack in packs:
+            stats[pack][asc_level]['total'] += 1
+            if victory:
+                stats[pack][asc_level]['wins'] += 1
+
+    average_win_rates = {}
+    for pack, asc_data in stats.items():
+        total_wins = sum(data['wins'] for data in asc_data.values())
+        total_runs = sum(data['total'] for data in asc_data.values())
+        average_win_rates[pack] = total_wins / total_runs if total_runs > 0 else 0
+
+    win_rate_deviation_by_pack = defaultdict(dict)
+
+    for pack, asc_data in stats.items():
+        for asc_level, data in asc_data.items():
+            win_rate = data['wins'] / data['total'] if data['total'] > 0 else 0
+            deviation = win_rate - average_win_rates[pack]
+            sign = '+' if deviation > 0 else ''
+            win_rate_deviation_by_pack[pack][asc_level] = f"{sign}{deviation:.2%}"
+
+    # Print the results
+    for pack in sorted(win_rate_deviation_by_pack.keys(), key=lambda p: del_prefix(p)):
+        print(f"Pack: {del_prefix(pack)}")
+        for asc_level in range(0, 21):
+            if asc_level in win_rate_deviation_by_pack[pack]:
+                print(f"Ascension {asc_level}: Deviation from average: {win_rate_deviation_by_pack[pack][asc_level]}")
+        print("\n")
+
+    return win_rate_deviation_by_pack
+
+
+def win_rate_deviation_by_ascension_and_pack_compact(runs: List[Dict[str, Any]]) -> Dict[str, Dict[int, str]]:
+    stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
+
+    for run in runs:
+        asc_level = run.get('ascension_level', 0)
+        packs = run.get('currentPacks', '').split(',')
+        victory = run.get('victory', False)
+
+        for pack in packs:
+            stats[pack][asc_level]['total'] += 1
+            if victory:
+                stats[pack][asc_level]['wins'] += 1
+
+    average_win_rates = {}
+    for pack, asc_data in stats.items():
+        total_wins = sum(data['wins'] for data in asc_data.values())
+        total_runs = sum(data['total'] for data in asc_data.values())
+        average_win_rates[pack] = total_wins / total_runs if total_runs > 0 else 0
+
+    win_rate_deviation_by_pack = defaultdict(dict)
+
+    for pack, asc_data in stats.items():
+        for asc_level, data in asc_data.items():
+            win_rate = data['wins'] / data['total'] if data['total'] > 0 else 0
+            deviation = win_rate - average_win_rates[pack]
+            sign = '+' if deviation > 0 else ''
+            win_rate_deviation_by_pack[pack][asc_level] = f"{sign}{deviation:.2%}"
+
+    # Print the results in a compact format
+    for pack in sorted(win_rate_deviation_by_pack.keys(), key=lambda p: del_prefix(p)):
+        a0_deviation = win_rate_deviation_by_pack[pack].get(0, "N/A")
+        a20_deviation = win_rate_deviation_by_pack[pack].get(20, "N/A")
+
+        # Calculate the difference between A0 and A20
+        if a0_deviation != "N/A" and a20_deviation != "N/A":
+            diff_deviation = float(a0_deviation.rstrip('%')) - float(a20_deviation.rstrip('%'))
+            sign = '+' if diff_deviation > 0 else ''
+            diff_deviation_str = f"{sign}{diff_deviation:.2f}%"
+        else:
+            diff_deviation_str = "N/A"
+
+        print(
+            f"{del_prefix(pack)}, Difference: 0/20: {diff_deviation_str}, A0: {a0_deviation}, A20: {a20_deviation}")
+
+    return win_rate_deviation_by_pack
+
+
+def win_rate_deviation_by_ascension_and_pack_vs_average(runs: List[Dict[str, Any]]) -> Dict[str, Dict[int, str]]:
+    pack_stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
+    asc_level_stats = defaultdict(lambda: {'wins': 0, 'total': 0})
+
+    for run in runs:
+        asc_level = run.get('ascension_level', 0)
+        packs = run.get('currentPacks', '').split(',')
+        victory = run.get('victory', False)
+
+        asc_level_stats[asc_level]['total'] += 1
+        if victory:
+            asc_level_stats[asc_level]['wins'] += 1
+
+        for pack in packs:
+            pack_stats[pack][asc_level]['total'] += 1
+            if victory:
+                pack_stats[pack][asc_level]['wins'] += 1
+
+    average_win_rates_by_asc = {}
+    for asc_level, data in asc_level_stats.items():
+        average_win_rates_by_asc[asc_level] = data['wins'] / data['total'] if data['total'] > 0 else 0
+
+    win_rate_deviation_by_pack = defaultdict(dict)
+
+    for pack, asc_data in pack_stats.items():
+        for asc_level, data in asc_data.items():
+            win_rate = data['wins'] / data['total'] if data['total'] > 0 else 0
+            deviation = win_rate - average_win_rates_by_asc[asc_level]
+            sign = '+' if deviation > 0 else ''
+            win_rate_deviation_by_pack[pack][asc_level] = f"{sign}{deviation:.2%}"
+
+    # Print the results in a verbose format
+    for pack in sorted(win_rate_deviation_by_pack.keys(), key=lambda p: del_prefix(p)):
+        print(f"\nPack: {del_prefix(pack)}")
+        for asc_level in range(0, 21):
+            deviation = win_rate_deviation_by_pack[pack].get(asc_level, "N/A")
+            print(f"Ascension{asc_level}: Deviation from average: {deviation}")
+
+    return win_rate_deviation_by_pack
+
+
+def win_rate_deviation_by_ascension_and_pack_vs_average_compact(runs: List[Dict[str, Any]]) -> Dict[str, Dict[int, str]]:
+    pack_stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
+    asc_level_stats = defaultdict(lambda: {'wins': 0, 'total': 0})
+
+    for run in runs:
+        asc_level = run.get('ascension_level', 0)
+        packs = run.get('currentPacks', '').split(',')
+        victory = run.get('victory', False)
+
+        asc_level_stats[asc_level]['total'] += 1
+        if victory:
+            asc_level_stats[asc_level]['wins'] += 1
+
+        for pack in packs:
+            pack_stats[pack][asc_level]['total'] += 1
+            if victory:
+                pack_stats[pack][asc_level]['wins'] += 1
+
+    average_win_rates_by_asc = {}
+    for asc_level, data in asc_level_stats.items():
+        average_win_rates_by_asc[asc_level] = data['wins'] / data['total'] if data['total'] > 0 else 0
+
+    win_rate_deviation_by_pack = defaultdict(dict)
+
+    for pack, asc_data in pack_stats.items():
+        for asc_level, data in asc_data.items():
+            win_rate = data['wins'] / data['total'] if data['total'] > 0 else 0
+            deviation = win_rate - average_win_rates_by_asc[asc_level]
+            sign = '+' if deviation > 0 else ''
+            win_rate_deviation_by_pack[pack][asc_level] = f"{sign}{deviation:.2%}"
+
+    # Print the results in a compact format
+    for pack in sorted(win_rate_deviation_by_pack.keys(), key=lambda p: del_prefix(p)):
+        a0_deviation = win_rate_deviation_by_pack[pack].get(0, "N/A")
+        a20_deviation = win_rate_deviation_by_pack[pack].get(20, "N/A")
+
+        # Calculate the difference between A0 and A20
+        if a0_deviation != "N/A" and a20_deviation != "N/A":
+            diff_deviation = float(a0_deviation.rstrip('%')) - float(a20_deviation.rstrip('%'))
+            sign = '+' if diff_deviation > 0 else ''
+            diff_deviation_str = f"{sign}{diff_deviation:.2f}%"
+        else:
+            diff_deviation_str = "N/A"
+
+        print(
+            f"{del_prefix(pack)}, Difference: 0/20: {diff_deviation_str}, A0: {a0_deviation}, A20: {a20_deviation}")
+
+    return win_rate_deviation_by_pack
+
+
+def win_rate_deviation_by_ascension_and_pack_sorted(runs: List[Dict[str, Any]]) -> Dict[str, Dict[int, str]]:
+    pack_stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
+    asc_level_stats = defaultdict(lambda: {'wins': 0, 'total': 0})
+
+    for run in runs:
+        asc_level = run.get('ascension_level', 0)
+        packs = run.get('currentPacks', '').split(',')
+        victory = run.get('victory', False)
+
+        asc_level_stats[asc_level]['total'] += 1
+        if victory:
+            asc_level_stats[asc_level]['wins'] += 1
+
+        for pack in packs:
+            pack_stats[pack][asc_level]['total'] += 1
+            if victory:
+                pack_stats[pack][asc_level]['wins'] += 1
+
+    average_win_rates_by_asc = {}
+    for asc_level, data in asc_level_stats.items():
+        average_win_rates_by_asc[asc_level] = data['wins'] / data['total'] if data['total'] > 0 else 0
+
+    win_rate_deviation_by_pack = defaultdict(dict)
+
+    for pack, asc_data in pack_stats.items():
+        for asc_level, data in asc_data.items():
+            win_rate = data['wins'] / data['total'] if data['total'] > 0 else 0
+            deviation = win_rate - average_win_rates_by_asc[asc_level]
+            sign = '+' if deviation > 0 else ''
+            win_rate_deviation_by_pack[pack][asc_level] = f"{sign}{deviation:.2%}"
+
+    # Sorting packs by the difference in win rate deviation between A0 and A20
+    sorted_packs = sorted(win_rate_deviation_by_pack.keys(),
+                          key=lambda p: abs(float(win_rate_deviation_by_pack[p].get(0, "0%").rstrip('%')) -
+                                         float(win_rate_deviation_by_pack[p].get(20, "0%").rstrip('%'))),
+                          reverse=True)
+
+    # Print the results
+    for pack in sorted_packs:
+        a0_deviation = win_rate_deviation_by_pack[pack].get(0, "N/A")
+        a20_deviation = win_rate_deviation_by_pack[pack].get(20, "N/A")
+
+        # Calculate the difference between A0 and A20
+        if a0_deviation != "N/A" and a20_deviation != "N/A":
+            diff_deviation = float(a0_deviation.rstrip('%')) - float(a20_deviation.rstrip('%'))
+            sign = '+' if diff_deviation > 0 else ''
+            diff_deviation_str = f"{sign}{diff_deviation:.2f}%"
+        else:
+            diff_deviation_str = "N/A"
+
+        print(f"{del_prefix(pack)}, Difference: 0/20: {diff_deviation_str}, A0: {a0_deviation}, A20: {a20_deviation}")
+
+    return win_rate_deviation_by_pack

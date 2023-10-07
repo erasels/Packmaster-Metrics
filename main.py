@@ -24,4 +24,4 @@ if __name__ == "__main__":
     card_to_pack = reverse_and_flatten_dict(pack_to_cards)
 
     all_data_dict = round_date_keys(date_to_metrics, 0)
-    insights.card_gem_synergies(all_data_dict[""])
+    insights.win_rate_deviation_by_ascension_and_pack_sorted(all_data_dict[""])
