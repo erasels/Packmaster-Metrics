@@ -2,7 +2,7 @@ import statistics
 from collections import Counter
 from itertools import combinations
 from collections import defaultdict
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, Any
 
 from logic.transformations import *
 
@@ -551,7 +551,8 @@ def median_health_before_rest(runs: List[Dict[str, any]]) -> Dict[int, float]:
                     overall_health_ratios.append(health_ratio)
 
     # Compute median health ratio for each ascension
-    median_healths = {ascension: statistics.median(health_ratios) for ascension, health_ratios in ascension_healths.items()}
+    median_healths = {ascension: statistics.median(health_ratios) for ascension, health_ratios in
+                      ascension_healths.items()}
 
     # Compute and print overall median
     overall_median = statistics.median(overall_health_ratios)
@@ -590,3 +591,122 @@ def smith_vs_rest_ratio(runs: List[Dict[str, any]]) -> Dict[int, Tuple[int, int]
             f"Ascension {ascension}: Smith to Rest Ratio: {ratio:.2f} ({choices['SMITH']} Smiths / {choices['REST']} Rests)")
 
     return ascension_choices
+
+
+def gem_impact_on_win_rate(runs: List[Dict[str, Any]]) -> Dict[str, str]:
+    total_runs_with_gems = 0
+    wins_with_gems = 0
+
+    total_runs_without_gems = 0
+    wins_without_gems = 0
+
+    for run in runs:
+        # Check if the run has the GemsPack
+        if "anniv5:GemsPack" not in run.get('currentPacks', ''):
+            continue
+
+        gem_modifiers = run.get('basemod:card_modifiers', [])
+
+        # Check if any card has a gem modifier
+        has_gems = any(gem_modifiers)
+
+        if has_gems:
+            total_runs_with_gems += 1
+            if run.get('victory', False):
+                wins_with_gems += 1
+        else:
+            total_runs_without_gems += 1
+            if run.get('victory', False):
+                wins_without_gems += 1
+
+    # Calculate win rates
+    win_rate_with_gems = make_ratio(wins_with_gems, total_runs_with_gems)
+    win_rate_without_gems = make_ratio(wins_without_gems, total_runs_without_gems)
+
+    results = {
+        "Win Rate with Gems": win_rate_with_gems,
+        "Win Rate without Gems": win_rate_without_gems
+    }
+
+    # Printing the results
+    print("Gem Impact on Win Rate:")
+    for key, value in results.items():
+        print(f"{key}: {value}")
+    print("\n")
+
+    return results
+
+
+def gem_count_vs_win_rate(runs: List[Dict[str, Any]]) -> Dict[int, str]:
+    gem_count_to_total_runs = defaultdict(int)
+    gem_count_to_wins = defaultdict(int)
+
+    for run in runs:
+        # Check if the run has the GemsPack
+        if "anniv5:GemsPack" not in run.get('currentPacks', ''):
+            continue
+
+        gem_modifiers = run.get('basemod:card_modifiers', [])
+
+        gem_count = 0
+        for mod_list in gem_modifiers:
+            if mod_list:
+                for mod in mod_list:
+                    if mod and "thePackmaster.cardmodifiers.gemspack" in mod.get('classname', ''):
+                        gem_count += 1
+
+        gem_count_to_total_runs[gem_count] += 1
+
+        if run.get('victory', False):
+            gem_count_to_wins[gem_count] += 1
+
+    # Calculate win rates
+    results = {}
+    for gem_count, total_runs in gem_count_to_total_runs.items():
+        wins = gem_count_to_wins.get(gem_count, 0)
+        results[gem_count] = make_ratio(wins, total_runs)
+
+    # Sorting results by gem count
+    sorted_results = dict(sorted(results.items()))
+
+    # Printing the results
+    print("Win Rate by Number of Socketed Gems:")
+    for gem_count, win_rate in sorted_results.items():
+        print(f"{gem_count} gems: {win_rate}")
+    print("\n")
+
+    return sorted_results
+
+
+def card_gem_synergies(runs: List[Dict[str, Any]]) -> Dict[str, int]:
+    card_gem_combinations = defaultdict(int)
+
+    for run in runs:
+        # Ensure the run has the GemsPack
+        if "anniv5:GemsPack" not in run.get('currentPacks', ''):
+            continue
+
+        master_deck = run.get('master_deck', [])
+        gem_modifiers = run.get('basemod:card_modifiers', [])
+
+        for card, mod_list in zip(master_deck, gem_modifiers):
+            if mod_list:
+                for mod in mod_list:
+                    if mod and "thePackmaster.cardmodifiers.gemspack" in mod.get('classname', ''):
+                        # Create a combination key
+                        combo = f"{del_prefix(del_upg(card))}_{(mod['classname'].split('.')[-1]).replace('Mod', '')}"
+                        card_gem_combinations[combo] += 1
+
+    # Filter out combinations that occur less than 50 times
+    frequent_combinations = {k: v for k, v in card_gem_combinations.items() if v >= 50}
+
+    # Sorting results by frequency
+    sorted_results = dict(sorted(frequent_combinations.items(), key=lambda item: item[1], reverse=True))
+
+    # Printing the results
+    print("Frequent Card-Gem Combinations:")
+    for combo, count in sorted_results.items():
+        print(f"{combo}: {count} times")
+    print("\n")
+
+    return sorted_results
