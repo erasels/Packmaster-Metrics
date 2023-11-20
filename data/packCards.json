@@ -1,4 +1,40 @@
 {
+    "bogwarden:NonAttackPack": [
+        "bogwarden:BolaToss",
+        "bogwarden:VilePowder",
+        "bogwarden:EntanglingVines",
+        "bogwarden:AcidCloud",
+        "bogwarden:FlockOfBats",
+        "bogwarden:RestlessSpirits",
+        "bogwarden:Attunement",
+        "bogwarden:UnstableConcoction",
+        "bogwarden:RefinedBlast",
+        "bogwarden:DeathWard"
+    ],
+    "bogwarden:ScryPack": [
+        "bogwarden:Incantation",
+        "bogwarden:Bushwhack",
+        "bogwarden:Stalker",
+        "bogwarden:EagleEyes",
+        "bogwarden:LineUp",
+        "bogwarden:Darkvision",
+        "bogwarden:Portents",
+        "bogwarden:Walkabout",
+        "bogwarden:CorpseFlies",
+        "bogwarden:WildMagic"
+    ],
+    "bogwarden:TrapPack": [
+        "bogwarden:Snip",
+        "bogwarden:SnareTrap",
+        "bogwarden:WatchAndLearn",
+        "bogwarden:PressurePlate",
+        "bogwarden:BagAndTag",
+        "bogwarden:SpinningBlades",
+        "bogwarden:WardingTotem",
+        "bogwarden:Bide",
+        "bogwarden:SludgeBomb",
+        "bogwarden:Friends"
+    ],
     "clockworkchar:ClockworkPack": [
         "clockworkchar:Solder",
         "clockworkchar:Blurrier",
@@ -1091,6 +1127,19 @@
         "anniv5:TunnelVision",
         "Static Discharge"
     ],
+    "anniv5:MagnetizePack": [
+        "anniv5:Attraction",
+        "anniv5:CoilBurst",
+        "anniv5:ElectronFlow",
+        "anniv5:FaradayField",
+        "anniv5:Ferroshield",
+        "anniv5:Fuzz",
+        "anniv5:InduceCurrent",
+        "anniv5:MagneticDomain",
+        "anniv5:PerfectedAlignment",
+        "anniv5:RepulsionField",
+        "anniv5:Superconductance"
+    ],
     "anniv5:MariDebuffPack": [
         "anniv5:OldCostume",
         "anniv5:PentupAnger",
@@ -1126,6 +1175,18 @@
         "anniv5:FurtherBeyond",
         "anniv5:MakeRoom",
         "anniv5:ActuallyFinalForm"
+    ],
+    "anniv5:PickThemAllPack": [
+        "anniv5:BulkUp",
+        "anniv5:GoldenPick",
+        "anniv5:DeckCheck",
+        "anniv5:BigBoots",
+        "anniv5:BurningFists",
+        "anniv5:PackGear",
+        "anniv5:TouchedByFlame",
+        "anniv5:DarkBargain",
+        "anniv5:GrabAndGo",
+        "anniv5:Transmogrifier"
     ],
     "anniv5:QuantaPack": [
         "anniv5:MissileStrike",

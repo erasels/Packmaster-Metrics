@@ -1,4 +1,5 @@
 data/metrics
 *.pkl
+*.pkl.bak
 .idea
 __pycache__
