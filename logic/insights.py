@@ -312,6 +312,47 @@ def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict) -> Non
             print(f"{add_pack_prefix(card, card_to_pack)}: {make_ratio(wins, total_runs)}")
 
 
+def count_average_win_rate_per_card_split_by_rarity(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> None:
+    # Create a dictionary to store the number of wins and total runs for each card
+    card_stats = {}
+
+    for data_dict in runs:
+        if "master_deck" in data_dict and "victory" in data_dict:
+            master_deck = [card.split('+')[0] for card in data_dict['master_deck']]
+            victory = data_dict["victory"]
+
+            for card in master_deck:
+                if card not in card_stats:
+                    card_stats[card] = {"wins": 0, "total_runs": 0}
+
+                card_stats[card]["total_runs"] += 1
+                if victory:
+                    card_stats[card]["wins"] += 1
+
+    # Group cards by rarity
+    rarity_groups = {}
+    for card, stats in card_stats.items():
+        rarity = card_to_rarity.get(card, "Unknown")
+        if rarity not in rarity_groups:
+            rarity_groups[rarity] = []
+        rarity_groups[rarity].append((card, stats))
+
+    # Process and print results for each rarity group
+    for rarity, cards in rarity_groups.items():
+        print(f"\n------ {rarity.upper()} ------\n")
+        sorted_cards = sorted(
+            cards,
+            key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0),
+            reverse=True
+        )
+
+        for card, stats in sorted_cards:
+            if card_to_pack.get(card):
+                wins = stats["wins"]
+                total_runs = stats["total_runs"]
+                print(f"{add_pack_prefix(card, card_to_pack)}: {make_ratio(wins, total_runs)}")
+
+
 # This is bogus data for fun
 def count_win_rate_per_picked_hat(runs: list[dict]) -> None:
     # Create a dictionary to store the number of wins and total runs for each pickedHat
@@ -954,7 +995,7 @@ def win_rate_deviation_by_ascension_and_pack_sorted(runs: List[Dict[str, Any]]) 
     # Sorting packs by the difference in win rate deviation between A0 and A20
     sorted_packs = sorted(win_rate_deviation_by_pack.keys(),
                           key=lambda p: abs(float(win_rate_deviation_by_pack[p].get(0, "0%").rstrip('%')) -
-                                         float(win_rate_deviation_by_pack[p].get(20, "0%").rstrip('%'))),
+                                            float(win_rate_deviation_by_pack[p].get(20, "0%").rstrip('%'))),
                           reverse=True)
 
     # Print the results
