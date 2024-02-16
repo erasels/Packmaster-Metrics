@@ -190,8 +190,7 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict) -> None:
     sorted_result = sorted(result, key=lambda x: x[3], reverse=True)
 
     for choice, picked_count, not_picked_count, pick_rate in sorted_result:
-        print(
-            f"{add_pack_prefix(choice, card_to_pack)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
+        print(f"{add_pack_prefix(choice, card_to_pack)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
 
 
 def count_win_rates(runs: list[dict]) -> None:

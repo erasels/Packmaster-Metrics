@@ -862,7 +862,10 @@
         "anniv5:WeaponMastery",
         "anniv5:SwordOfChaos",
         "anniv5:SwordOfFire",
-        "anniv5:SwordOfWisdom"
+        "anniv5:SwordOfWisdom",
+        "anniv5:ArmorUp",
+        "anniv5:PirateHook",
+        "anniv5:ReapersScythe"
     ],
     "anniv5:WomanInBluePack": [
         "anniv5:BlockVial",
@@ -1098,6 +1101,7 @@
         "anniv5:Spotlight",
         "anniv5:Exultation",
         "anniv5:Radiance",
+        "anniv5:Revolution",
         "anniv5:Apex",
         "anniv5:PowerStruggle"
     ],
