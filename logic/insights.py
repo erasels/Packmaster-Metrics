@@ -1013,3 +1013,51 @@ def win_rate_deviation_by_ascension_and_pack_sorted(runs: List[Dict[str, Any]]) 
         print(f"{del_prefix(pack)}, Difference: 0/20: {diff_deviation_str}, A0: {a0_deviation}, A20: {a20_deviation}")
 
     return win_rate_deviation_by_pack
+
+
+def calculate_card_pick_deviation_per_pack(runs: List[Dict], card_to_pack: Dict[str, str]) -> None:
+    picked_counts = Counter()
+    not_picked_counts = Counter()
+    card_pick_rates = {}  # To store pick rates of each card
+    pack_pick_rates = defaultdict(list)  # To store pick rates of cards for calculating pack averages
+
+    # Count picks and not picks
+    for data_dict in runs:
+        current_packs = set(data_dict.get("currentPacks", "").split(","))
+        card_choices = data_dict.get("card_choices", [])
+        for choice in card_choices:
+            picked = del_upg(choice.get("picked"))  # Do not score upgraded card choices differently
+            not_picked = [del_upg(card) for card in choice.get("not_picked", [])]
+
+            if picked and card_to_pack.get(picked) in current_packs:
+                picked_counts.update([picked])
+
+            not_picked = [card for card in not_picked if card_to_pack.get(card) in current_packs]
+            not_picked_counts.update(not_picked)
+
+    # Calculate pick rates for each card and aggregate them into packs
+    for choice, picked_count in picked_counts.items():
+        not_picked_count = not_picked_counts[choice]
+        total_count = picked_count + not_picked_count
+        pick_rate = picked_count / total_count if total_count > 0 else 0
+        card_pick_rates[choice] = pick_rate
+        pack_pick_rates[card_to_pack[choice]].append(pick_rate)
+
+    # Calculate the average pick rate for each pack
+    pack_average_pick_rates = {pack: statistics.mean(rates) for pack, rates in pack_pick_rates.items()}
+
+    # Calculate deviation of each card's pick rate from its pack's average
+    card_deviations = {}
+    for card, pick_rate in card_pick_rates.items():
+        pack = card_to_pack[card]
+        pack_average = pack_average_pick_rates[pack]
+        deviation = pick_rate - pack_average
+        card_deviations[card] = deviation
+
+    # Sort and print results
+    sorted_card_deviations = sorted(card_deviations.items(), key=lambda x: x[1], reverse=True)
+    for card, deviation in sorted_card_deviations:
+        pack = card_to_pack[card]
+        card_pick_rate = card_pick_rates[card]
+        pack_average = pack_average_pick_rates[pack]
+        print(f"{del_prefix(pack)}:{del_prefix(card)}: Pick rate: {card_pick_rate:.2%}, Pack avg: {pack_average:.2%}, Deviation: {deviation:.2%}")
