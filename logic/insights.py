@@ -1015,7 +1015,8 @@ def win_rate_deviation_by_ascension_and_pack_sorted(runs: List[Dict[str, Any]]) 
     return win_rate_deviation_by_pack
 
 
-def calculate_card_pick_deviation_per_pack(runs: List[Dict], card_to_pack: Dict[str, str]) -> None:
+# Pick rate deviation of pack average by card (excluding special cards)
+def calculate_card_pick_deviation_per_pack(runs: List[Dict], card_to_pack: Dict[str, str], card_to_rarity: dict) -> None:
     picked_counts = Counter()
     not_picked_counts = Counter()
     card_pick_rates = {}  # To store pick rates of each card
@@ -1029,10 +1030,11 @@ def calculate_card_pick_deviation_per_pack(runs: List[Dict], card_to_pack: Dict[
             picked = del_upg(choice.get("picked"))  # Do not score upgraded card choices differently
             not_picked = [del_upg(card) for card in choice.get("not_picked", [])]
 
-            if picked and card_to_pack.get(picked) in current_packs:
+            # Exclude special rarity cards from both picked and not picked
+            if picked and card_to_pack.get(picked) in current_packs and card_to_rarity.get(picked) != "Special":
                 picked_counts.update([picked])
 
-            not_picked = [card for card in not_picked if card_to_pack.get(card) in current_packs]
+            not_picked = [card for card in not_picked if card_to_pack.get(card) in current_packs and card_to_rarity.get(card) != "Special"]
             not_picked_counts.update(not_picked)
 
     # Calculate pick rates for each card and aggregate them into packs
@@ -1044,7 +1046,7 @@ def calculate_card_pick_deviation_per_pack(runs: List[Dict], card_to_pack: Dict[
         pack_pick_rates[card_to_pack[choice]].append(pick_rate)
 
     # Calculate the average pick rate for each pack
-    pack_average_pick_rates = {pack: statistics.mean(rates) for pack, rates in pack_pick_rates.items()}
+    pack_average_pick_rates = {pack: statistics.mean(rates) for pack, rates in pack_pick_rates.items() if rates}
 
     # Calculate deviation of each card's pick rate from its pack's average
     card_deviations = {}
