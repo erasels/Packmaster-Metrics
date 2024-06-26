@@ -3,3 +3,4 @@ data/metrics
 *.pkl.bak
 .idea
 __pycache__
+experiment/
