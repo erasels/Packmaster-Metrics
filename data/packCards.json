@@ -141,7 +141,8 @@
         "Scrape",
         "Reprogram",
         "Machine Learning",
-        "All For One"
+        "All For One",
+        "Finisher"
     ],
     "anniv5:AnomalyPack": [
         "anniv5:Wonder",
@@ -254,13 +255,13 @@
         "anniv5:ThrowChips"
     ],
     "anniv5:BulwarkPack": [
-        "Body Slam",
-        "PiercingWail",
+        "Backflip",
+        "Conserve Battery",
         "Steam",
-        "Feel No Pain",
-        "Blur",
-        "Genetic Algorithm",
-        "WaveOfTheHand",
+        "Swivel",
+        "Undo",
+        "Sanctity",
+        "Second Wind",
         "Juggernaut",
         "After Image",
         "SpiritShield"
@@ -276,7 +277,8 @@
         "anniv5:SearingClaw",
         "anniv5:TalkToTheClaw",
         "anniv5:TwinClaw",
-        "anniv5:GhostClaw"
+        "anniv5:GhostClaw",
+        "anniv5:PMClaw"
     ],
     "anniv5:ColorlessPack": [
         "anniv5:Manifest",
@@ -527,7 +529,12 @@
         "anniv5:StardustReverie",
         "anniv5:UltimateShortwave",
         "anniv5:DragonMeteor",
-        "anniv5:EarthlightRay"
+        "anniv5:EarthlightRay",
+        "anniv5:GrandCross",
+        "anniv5:CasketOfStars",
+        "anniv5:BlazingStar",
+        "anniv5:EscapeVelocity",
+        "anniv5:EventHorizon"
     ],
     "anniv5:MonsterHunterPack": [
         "anniv5:CarvingKnife",
@@ -573,7 +580,8 @@
         "anniv5:ShiningStyle",
         "anniv5:SleeveUp",
         "anniv5:ZaHando",
-        "anniv5:StylePoints"
+        "anniv5:StylePoints",
+        "anniv5:EightBall"
     ],
     "anniv5:OrbPack": [
         "anniv5:Allocate",
@@ -732,11 +740,11 @@
         "Underhanded Strike",
         "Cloak And Dagger",
         "Calculated Gamble",
-        "Finisher",
         "Choke",
         "Footwork",
         "Bullet Time",
-        "Storm of Steel"
+        "Storm of Steel",
+        "Leg Sweep"
     ],
     "anniv5:StatusPack": [
         "Wild Strike",
@@ -1042,7 +1050,18 @@
         "anniv5:Improvise",
         "anniv5:PlannedDefense",
         "anniv5:SecondStrike",
-        "anniv5:Surge"
+        "anniv5:Surge",
+        "anniv5:WellWrittenScript",
+        "anniv5:PlotArmor",
+        "anniv5:Lights",
+        "anniv5:Starring",
+        "anniv5:Foreshadow",
+        "anniv5:StickySituation",
+        "anniv5:GrandOpening",
+        "anniv5:BreakALeg",
+        "anniv5:StartOver",
+        "anniv5:Camera",
+        "anniv5:Action"
     ],
     "anniv5:GraveyardPack": [
         "anniv5:GreyBargain",
@@ -1274,7 +1293,8 @@
         "anniv5:PerfectClarity",
         "anniv5:GhostingMaelstrom",
         "anniv5:TeleportBot",
-        "anniv5:Flash"
+        "anniv5:Flash",
+        "anniv5:SnowballDash"
     ],
     "anniv5:WarriorPack": [
         "anniv5:Bolas",
@@ -1299,5 +1319,43 @@
         "anniv5:MoonlightFlight",
         "anniv5:WitchTwist",
         "anniv5:FullMoonHalo"
+    ],
+    "anniv5:NeedleworkPack": [
+        "anniv5:Needlework",
+        "anniv5:Backstitch",
+        "anniv5:CrossStitch",
+        "anniv5:Reading",
+        "anniv5:Read",
+        "anniv5:Cleanup",
+        "anniv5:Knot",
+        "anniv5:Pincushion",
+        "anniv5:Rethread",
+        "anniv5:CopyAndPaste",
+        "anniv5:Patchwork"
+    ],
+    "anniv5:IndomitablePack": [
+        "Body Slam",
+        "Leap",
+        "PiercingWail",
+        "Blur",
+        "Caltrops",
+        "Feel No Pain",
+        "Genetic Algorithm",
+        "WaveOfTheHand",
+        "Buffer",
+        "Impervious"
+    ],
+    "anniv5:ShowmanPack": [
+        "anniv5:Grandstand",
+        "anniv5:Dazzle",
+        "anniv5:SeeMe",
+        "anniv5:ForMyNextTrick",
+        "anniv5:DramaticExit",
+        "anniv5:Amaze",
+        "anniv5:Showstopper",
+        "anniv5:SmokeAndMirrors",
+        "anniv5:HallOfMirrors",
+        "anniv5:MagicCylinder",
+        "anniv5:NowYouDont"
     ]
 }
