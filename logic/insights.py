@@ -538,7 +538,7 @@ def upgraded_card_win_rate_analysis(runs: list[dict]) -> dict:
     return insights
 
 
-def median_health_before_rest(runs: List[Dict[str, any]]) -> dict:
+def median_health_before_rest(runs: list[dict]) -> dict:
     # Dictionary to hold health values for each ascension level
     ascension_healths = defaultdict(list)
     overall_health_ratios = []  # Track health ratios across all ascensions
@@ -580,7 +580,7 @@ def median_health_before_rest(runs: List[Dict[str, any]]) -> dict:
     return insights
 
 
-def smith_vs_rest_ratio(runs: List[Dict[str, any]]) -> Dict[int, Tuple[int, int]]:
+def smith_vs_rest_ratio(runs: list[dict]) -> dict:
     # Dictionary to hold count of 'SMITH' and 'REST' choices for each ascension level
     ascension_choices = defaultdict(lambda: {'SMITH': 0, 'REST': 0})
     overall_choices = {'SMITH': 0, 'REST': 0}  # Track overall 'SMITH' and 'REST' choices
@@ -594,17 +594,24 @@ def smith_vs_rest_ratio(runs: List[Dict[str, any]]) -> Dict[int, Tuple[int, int]
 
     # Compute and print overall ratio
     overall_ratio = overall_choices['SMITH'] / overall_choices['REST'] if overall_choices['REST'] > 0 else 0
-    print(
-        f"Overall Smith to Rest Ratio: {overall_ratio:.2f} ({overall_choices['SMITH']} Smiths / {overall_choices['REST']} Rests)")
 
-    # Compute and print ratio for each ascension, sorted
+    data = [["Overall", overall_choices['SMITH'], overall_choices['REST'], f"{overall_ratio:.2f}"]]
+
     for ascension in sorted(ascension_choices.keys()):
         choices = ascension_choices[ascension]
         ratio = choices['SMITH'] / choices['REST'] if choices['REST'] > 0 else 0
-        print(
-            f"Ascension {ascension}: Smith to Rest Ratio: {ratio:.2f} ({choices['SMITH']} Smiths / {choices['REST']} Rests)")
+        data.append([ascension, choices['SMITH'], choices['REST'], f"{ratio:.2f}"])
 
-    return ascension_choices
+    # Format into the insights structure
+    insights = {
+        "SmithVsRest": {
+            "description": "Shows the ratio of smiths to rests at campsites.",
+            "headers": ["Ascension Level", "Number of Smiths", "Number of Rests", "Smith to Rest Ratio"],
+            "data": data
+        }
+    }
+
+    return insights
 
 
 def gem_impact_on_win_rate(runs: List[Dict[str, Any]]) -> Dict[str, str]:
