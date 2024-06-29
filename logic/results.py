@@ -1,15 +1,26 @@
 def print_insight_dict(insights):
-    max_width = max(len(sheet_name) for sheet_name in insights.keys())
     for sheet_name, details in insights.items():
+        # Sheet header
+        max_width = max(len(sheet_name) for sheet_name in insights.keys())
         print(f"Sheet Name: {sheet_name.ljust(max_width)}")
         print(f"Description: {details['description']}")
-        print("Headers: " + ", ".join(details['headers']))
-        col_width = max(len(str(item)) for row in details['data'] for item in row)
-        header_row = details['headers']
-        max_line_length = len(" | ".join(str(item).ljust(col_width) for item in header_row))
-        print("-" * max_line_length)  # Separator between headers and data
-        print(" | ".join(str(item).ljust(col_width) for item in header_row))
-        print("-" * max_line_length)  # Separator between header and data rows
-        for row in details['data']:
-            print(" | ".join(str(item).ljust(col_width) for item in row))
-        print("-" * max_line_length)  # Separator for readability
+
+        # Calculate maximum column width for each column
+        headers = details['headers']
+        data = details['data']
+        col_widths = [max(len(str(item)) for item in [header] + [row[index] for row in data]) for index, header in enumerate(headers)]
+
+        # Print table
+        def format_row(row, widths):
+            return " | ".join(str(item).ljust(width) for item, width in zip(row, widths))
+
+        # Header and separator
+        header_row = format_row(headers, col_widths)
+        print("-" * len(header_row))
+        print(header_row)
+        print("-" * len(header_row))
+
+        # Data rows
+        for row in data:
+            print(format_row(row, col_widths))
+        print("-" * len(header_row))  # End separator
