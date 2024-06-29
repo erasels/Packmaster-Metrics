@@ -95,20 +95,20 @@ def count_pack_picks(runs: list[dict]) -> dict:
 
         # Calculate pick rate and format to 2 decimal places
         if total_count > 0:
-            pick_rate = f"{(picked_count / total_count) * 100:.2f}%"
+            pick_rate = f"{(picked_count / total_count) * 100:.2f}"
         else:
-            pick_rate = "0.00%"
+            pick_rate = "0.00"
 
         # Append the processed data
         result.append([del_prefix(choice), picked_count, total_count, pick_rate])
 
-    # Sort the results by pick rate (convert string percentage back to float for sorting)
-    sorted_result = sorted(result, key=lambda x: float(x[3][:-1]), reverse=True)
+    # Sort the results by pick rate
+    sorted_result = sorted(result, key=lambda x: float(x[3]), reverse=True)
 
     insights_dict = {
         "Pack pickrate": {
             "description": "Shows the pack pick rate.",
-            "headers": ["Pack Name", "Picked Count", "Total Count", "Pick Rate"],
+            "headers": ["Pack Name", "Picked", "Total", "Pick Rate"],
             "data": sorted_result
         }
     }
@@ -235,10 +235,10 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: d
                        del_prefix(choice),
                        picked_count,
                        not_picked_count + picked_count,
-                       f"{pick_rate:.2%}"])
+                       f"{pick_rate:.2f}"])
 
     # Sort the results by pick rate in descending order
-    sorted_result = sorted(result, key=lambda x: float(x[5][:-1]), reverse=True)
+    sorted_result = sorted(result, key=lambda x: float(x[5]), reverse=True)
 
     insights = {
         "Card pickrate": {
@@ -370,7 +370,7 @@ def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict, card_t
     for card, stats in sorted_card_stats:
         if card_to_pack.get(card) and stats["total_runs"] >= 50:
             total_runs = stats["total_runs"]
-            win_rate = f"{stats['wins'] / total_runs:.2%}" if total_runs > 0 else "N/A"
+            win_rate = f"{(stats['wins'] / total_runs)*100:.2f}" if total_runs > 0 else "N/A"
             data.append([card_to_rarity.get(card, "Unknown"),
                          del_prefix(card_to_pack.get(card)),
                          del_prefix(card),
