@@ -703,40 +703,6 @@ def gem_count_vs_win_rate(runs: list[dict]) -> dict:
     return insights
 
 
-def card_gem_synergies(runs: List[Dict[str, Any]]) -> Dict[str, int]:
-    card_gem_combinations = defaultdict(int)
-
-    for run in runs:
-        # Ensure the run has the GemsPack
-        if "anniv5:GemsPack" not in run.get('currentPacks', ''):
-            continue
-
-        master_deck = run.get('master_deck', [])
-        gem_modifiers = run.get('basemod:card_modifiers', [])
-
-        for card, mod_list in zip(master_deck, gem_modifiers):
-            if mod_list:
-                for mod in mod_list:
-                    if mod and "thePackmaster.cardmodifiers.gemspack" in mod.get('classname', ''):
-                        # Create a combination key
-                        combo = f"{del_prefix(del_upg(card))}_{(mod['classname'].split('.')[-1]).replace('Mod', '')}"
-                        card_gem_combinations[combo] += 1
-
-    # Filter out combinations that occur less than 50 times
-    frequent_combinations = {k: v for k, v in card_gem_combinations.items() if v >= 50}
-
-    # Sorting results by frequency
-    sorted_results = dict(sorted(frequent_combinations.items(), key=lambda item: item[1], reverse=True))
-
-    # Printing the results
-    print("Frequent Card-Gem Combinations:")
-    for combo, count in sorted_results.items():
-        print(f"{combo}: {count} times")
-    print("\n")
-
-    return sorted_results
-
-
 def win_rate_by_ascension_and_pack(runs: list[dict]) -> dict:
     stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
 
@@ -813,7 +779,7 @@ def win_rate_deviation_between_asc(runs: list[dict]) -> dict:
             ])
 
     insights = {
-        "WinRateDeviation": {
+        "Win rate deviation between asc": {
             "description": "Comparative win rates and deviation for packs between ascension level 0 and 20.",
             "headers": ["Pack", "Asc 0 Win Rate", "Asc 20 Win Rate", "Deviation"],
             "data": insights_data
@@ -870,7 +836,7 @@ def win_rate_deviation_from_average_by_asc(runs: list[dict]) -> dict:
             ])
 
     insights = {
-        "WinRateDeviation": {
+        "Win rate deviation from average": {
             "description": "Comparative win rates and deviations of packs against the average win rates for ascension levels 0 and 20.",
             "headers": ["Pack", "Pack Asc 0 Win Rate", "Pack Asc 20 Win Rate", "Deviation from Avg Asc 0", "Deviation from Avg Asc 20"],
             "data": insights_data
