@@ -1,3 +1,5 @@
+import gc
+
 from logic import insights
 from logic.results import print_insight_dict, write_insight_to_file
 from logic.storage import *
@@ -40,7 +42,6 @@ if __name__ == "__main__":
     write_insight_to_file(insights.count_average_win_rate_per_card(all_data, card_to_pack, card_to_rarity))
     write_insight_to_file(insights.count_win_rate_per_picked_hat(all_data))
     write_insight_to_file(insights.count_median_turn_length_per_enemy(all_data))
-    write_insight_to_file(insights.count_upgraded_cards(all_data))
     write_insight_to_file(insights.upgraded_card_win_rate_analysis(all_data))
     write_insight_to_file(insights.median_health_before_rest(all_data))
     write_insight_to_file(insights.smith_vs_rest_ratio(all_data))
@@ -50,4 +51,7 @@ if __name__ == "__main__":
     write_insight_to_file(insights.win_rate_deviation_between_asc(all_data))
     write_insight_to_file(insights.win_rate_deviation_from_average_by_asc(all_data))
     write_insight_to_file(insights.calculate_card_pick_deviation(all_data, card_to_pack, card_to_rarity))
+
+    del all_data
+    gc.collect()
 
