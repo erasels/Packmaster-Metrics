@@ -1,4 +1,5 @@
 from logic import insights
+from logic.results import print_insight_dict
 from logic.storage import *
 
 # Global dictionary to store sublists based on file paths
@@ -27,3 +28,4 @@ if __name__ == "__main__":
 
     all_data = mega_list_merge(date_to_metrics)
     del date_to_metrics
+    print_insight_dict(insights.sum_filtered_packs(all_data))

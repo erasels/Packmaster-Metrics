@@ -8,7 +8,7 @@ from logic.transformations import *
 
 
 # Counts the number of packs filtered by each player and prints the most common ones.
-def sum_filtered_packs(runs: list[dict]) -> None:
+def sum_filtered_packs(runs: list[dict]) -> Dict:
     word_counts = Counter()
     host_word_counts = {}
 
@@ -31,8 +31,19 @@ def sum_filtered_packs(runs: list[dict]) -> None:
         # Update host_word_counts for this host with the newly counted words
         host_word_counts[host].update(new_words)
 
-    for word, count in word_counts.most_common():
-        print(f"{del_prefix(word)}: {count}")
+    # Create the data rows sorted by the most filtered packs
+    sorted_packs = sorted(word_counts.items(), key=lambda item: item[1], reverse=True)
+    data_rows = [[del_prefix(pack), count] for pack, count in sorted_packs]
+
+    insights = {
+        "Blacklisted packs": {
+            "description": "Shows how often packs are blacklisted by unique hosts.",
+            "headers": ["Pack Name", "Filtered"],
+            "data": data_rows
+        }
+    }
+
+    return insights
 
 
 # Counts the number of runs with enabledExpansionPacks and prints the ratio.
