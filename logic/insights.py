@@ -614,7 +614,7 @@ def smith_vs_rest_ratio(runs: list[dict]) -> dict:
     return insights
 
 
-def gem_impact_on_win_rate(runs: List[Dict[str, Any]]) -> Dict[str, str]:
+def gem_impact_on_win_rate(runs: list[dict]) -> dict:
     total_runs_with_gems = 0
     wins_with_gems = 0
 
@@ -644,18 +644,18 @@ def gem_impact_on_win_rate(runs: List[Dict[str, Any]]) -> Dict[str, str]:
     win_rate_with_gems = make_ratio(wins_with_gems, total_runs_with_gems)
     win_rate_without_gems = make_ratio(wins_without_gems, total_runs_without_gems)
 
-    results = {
-        "Win Rate with Gems": win_rate_with_gems,
-        "Win Rate without Gems": win_rate_without_gems
+    insights = {
+        "Gem Impact on Win Rate": {
+            "description": "Shows the impact of gems on win rates in a game.",
+            "headers": ["Condition", "Wins", "Total", "Win Rate"],
+            "data": [
+                ["With Gems", wins_with_gems, total_runs_with_gems, win_rate_with_gems],
+                ["Without Gems", wins_without_gems, total_runs_without_gems, win_rate_without_gems]
+            ]
+        }
     }
 
-    # Printing the results
-    print("Gem Impact on Win Rate:")
-    for key, value in results.items():
-        print(f"{key}: {value}")
-    print("\n")
-
-    return results
+    return insights
 
 
 def gem_count_vs_win_rate(runs: List[Dict[str, Any]]) -> Dict[int, str]:
