@@ -37,7 +37,7 @@ def write_insight_to_file(insights, output_directory="insight_files"):
         # Prepare the file path
         file_path = os.path.join(output_directory, f"{sheet_name}.txt")
 
-        with open(file_path, 'w') as file:
+        with open(file_path, 'w', encoding='utf-8') as file:
             # Sheet header
             max_width = max(len(sheet_name) for sheet_name in insights.keys())
             file.write(f"Description: {details['description']}\n")
