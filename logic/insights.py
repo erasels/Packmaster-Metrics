@@ -538,7 +538,7 @@ def upgraded_card_win_rate_analysis(runs: list[dict]) -> dict:
     return insights
 
 
-def median_health_before_rest(runs: List[Dict[str, any]]) -> Dict[int, float]:
+def median_health_before_rest(runs: List[Dict[str, any]]) -> dict:
     # Dictionary to hold health values for each ascension level
     ascension_healths = defaultdict(list)
     overall_health_ratios = []  # Track health ratios across all ascensions
@@ -560,15 +560,24 @@ def median_health_before_rest(runs: List[Dict[str, any]]) -> Dict[int, float]:
                       ascension_healths.items()}
 
     # Compute and print overall median
-    overall_median = statistics.median(overall_health_ratios)
-    print(f"Overall Median Health Ratio Before Rest: {overall_median:.2%}")
+    overall_median = statistics.median(overall_health_ratios) * 100
 
-    # Print results for each ascension, sorted
+    data = [["Overall", f"{overall_median:.2f}"]]
+
     for ascension in sorted(median_healths.keys()):
-        health_ratio = median_healths[ascension]
-        print(f"Ascension {ascension}: Median Health Ratio Before Rest: {health_ratio:.2%}")
+        health_ratio = median_healths[ascension] * 100
+        data.append([ascension, f"{health_ratio:.2f}"])
 
-    return median_healths
+    # Create insights structure
+    insights = {
+        "Health before rest": {
+            "description": "Median health ratios before rest across different ascension levels.",
+            "headers": ["Ascension Level", "Median Health Before Rest"],
+            "data": data
+        }
+    }
+
+    return insights
 
 
 def smith_vs_rest_ratio(runs: List[Dict[str, any]]) -> Dict[int, Tuple[int, int]]:
