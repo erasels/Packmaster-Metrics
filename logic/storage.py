@@ -1,6 +1,7 @@
 import json
 import os
 import pickle
+from collections import defaultdict
 
 
 def process_file(directory, file_path, encoding='utf-8'):
@@ -65,19 +66,21 @@ def round_date_keys(input_dict, level):
     if level < 0:
         raise ValueError("Level must be a non-negative integer.")
 
-    merged_dict = {}
+    merged_dict = defaultdict(list)
 
     for date_key, data_list in input_dict.items():
         date_parts = date_key.split('/')
         rounded_key = '/'.join(date_parts[:level])
-
-        if rounded_key not in merged_dict:
-            merged_dict[rounded_key] = []
-
-        # Merge the lists at the specified level
         merged_dict[rounded_key].extend(data_list)
 
     return merged_dict
+
+
+def single_key_merge(input_dict):
+    mega_list = []
+    for data_list in input_dict.values():
+        mega_list.extend(data_list)
+    return {"": mega_list}
 
 
 # To be used on the pack_to_cards dict to reverse it into cards to pack
