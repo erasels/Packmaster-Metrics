@@ -881,7 +881,7 @@ def win_rate_deviation_from_average_by_asc(runs: list[dict]) -> dict:
 
 
 # Pick rate deviation of pack average by card (excluding special cards)
-def calculate_card_pick_deviation_per_pack(runs: List[Dict], card_to_pack: Dict[str, str], card_to_rarity: dict) -> None:
+def calculate_card_pick_deviation(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> dict:
     picked_counts = Counter()
     not_picked_counts = Counter()
     card_pick_rates = {}  # To store pick rates of each card
@@ -921,10 +921,14 @@ def calculate_card_pick_deviation_per_pack(runs: List[Dict], card_to_pack: Dict[
         deviation = pick_rate - pack_average
         card_deviations[card] = deviation
 
-    # Sort and print results
-    sorted_card_deviations = sorted(card_deviations.items(), key=lambda x: x[1], reverse=True)
-    for card, deviation in sorted_card_deviations:
-        pack = card_to_pack[card]
-        card_pick_rate = card_pick_rates[card]
-        pack_average = pack_average_pick_rates[pack]
-        print(f"{del_prefix(pack)}:{del_prefix(card)}: Pick rate: {card_pick_rate:.2%}, Pack avg: {pack_average:.2%}, Deviation: {deviation:.2%}")
+    insights = {
+        "Card Pick Deviations": {
+            "description": "Deviation of card pick rates from their pack averages.",
+            "headers": ["Pack", "Card", "Pick Rate", "Pack Average", "Deviation"],
+            "data": [
+                [del_prefix(card_to_pack[card]), del_prefix(card), f"{card_pick_rates[card]*100:.2f}", f"{pack_average_pick_rates[card_to_pack[card]]*100:.2f}", f"{deviation:.2%}"]
+                for card, deviation in sorted(card_deviations.items(), key=lambda x: x[1], reverse=True)
+            ]
+        }
+    }
+    return insights
