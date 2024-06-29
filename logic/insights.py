@@ -343,7 +343,7 @@ def count_median_deck_sizes(runs: list[dict]) -> dict:
     return insights
 
 
-def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict) -> None:
+def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> dict:
     # Create a dictionary to store the number of wins and total runs for each card
     card_stats = {}
 
@@ -366,73 +366,29 @@ def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict) -> Non
                                key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0),
                                reverse=True)
 
-    cards_with_200_runs_or_more = []
-    cards_with_less_than_200_runs = []
+    data = []
 
     for card, stats in sorted_card_stats:
-        total_runs = stats["total_runs"]
-        if total_runs >= 200:
-            cards_with_200_runs_or_more.append((card, stats))
-        else:
-            cards_with_less_than_200_runs.append((card, stats))
-
-    # Sort the cards with at least 200 total runs by win rate
-    sorted_cards_with_200_runs_or_more = sorted(
-        cards_with_200_runs_or_more,
-        key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0),
-        reverse=True,
-    )
-
-    # Combine and print the results
-    sorted_results = sorted_cards_with_200_runs_or_more + cards_with_less_than_200_runs
-
-    # Calculate and print the average win rate for each card
-    for card, stats in sorted_results:
-        if card_to_pack.get(card):
-            wins = stats["wins"]
+        if card_to_pack.get(card) and stats["total_runs"] >= 50:
             total_runs = stats["total_runs"]
-            print(f"{add_pack_prefix(card, card_to_pack)}: {make_ratio(wins, total_runs)}")
+            win_rate = f"{stats['wins'] / total_runs:.2%}" if total_runs > 0 else "N/A"
+            data.append([card_to_rarity.get(card, "Unknown"),
+                         card_to_pack.get(card),
+                         del_prefix(card),
+                         stats['wins'],
+                         total_runs,
+                         win_rate])
 
+    # Return the insights data structure
+    insights = {
+        "Winrate by card": {
+            "description": "Shows the win rate for each card.",
+            "headers": ["Rarity", "Pack", "Card", "Wins", "Total", "Win Rate"],
+            "data": data
+        }
+    }
 
-def count_average_win_rate_per_card_split_by_rarity(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> None:
-    # Create a dictionary to store the number of wins and total runs for each card
-    card_stats = {}
-
-    for data_dict in runs:
-        if "master_deck" in data_dict and "victory" in data_dict:
-            master_deck = [card.split('+')[0] for card in data_dict['master_deck']]
-            victory = data_dict["victory"]
-
-            for card in master_deck:
-                if card not in card_stats:
-                    card_stats[card] = {"wins": 0, "total_runs": 0}
-
-                card_stats[card]["total_runs"] += 1
-                if victory:
-                    card_stats[card]["wins"] += 1
-
-    # Group cards by rarity
-    rarity_groups = {}
-    for card, stats in card_stats.items():
-        rarity = card_to_rarity.get(card, "Unknown")
-        if rarity not in rarity_groups:
-            rarity_groups[rarity] = []
-        rarity_groups[rarity].append((card, stats))
-
-    # Process and print results for each rarity group
-    for rarity, cards in rarity_groups.items():
-        print(f"\n------ {rarity.upper()} ------\n")
-        sorted_cards = sorted(
-            cards,
-            key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0),
-            reverse=True
-        )
-
-        for card, stats in sorted_cards:
-            if card_to_pack.get(card):
-                wins = stats["wins"]
-                total_runs = stats["total_runs"]
-                print(f"{add_pack_prefix(card, card_to_pack)}: {make_ratio(wins, total_runs)}")
+    return insights
 
 
 # This is bogus data for fun
