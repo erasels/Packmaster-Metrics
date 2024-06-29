@@ -476,88 +476,6 @@ def count_median_turn_length_per_enemy(runs: list[dict]) -> dict:
     return insights
 
 
-# Turned out kind of useless, since popular packs have a heavy influence on this output. Prints the frequency of the pair and the total win rate with that pair in the deck.
-# Analyzes card synergy based on the frequency and win rate of card combinations.
-def card_synergy_analysis(runs: list[dict]) -> None:
-    # Counting the frequency of each card pair in winning runs
-    pair_counts = defaultdict(int)
-    total_winning_runs = 0
-
-    cards_to_clean = ["Rummage", "Cardistry", "Strike", "Defend", "AscendersBane"]
-
-    for run in runs:
-        if run.get('victory', False):
-            total_winning_runs += 1
-            # Remove upgrade and prefix from cards
-            cards = [del_prefix(del_upg(card)) for card in run['master_deck']]
-            # Removing unwanted cards from the dataset
-            cards = [card for card in cards if card not in cards_to_clean]
-            # Ensuring each card is unique for the current run
-            cards = list(set(cards))
-
-            for combo in combinations(cards, 2):
-                # Sorting to ensure (CardA, CardB) is the same as (CardB, CardA)
-                sorted_combo = tuple(sorted(combo))
-                pair_counts[sorted_combo] += 1
-
-    # Analyzing card pairs
-    synergy_data = {}
-    for pair, count in pair_counts.items():
-        win_rate = (count / total_winning_runs) * 100
-        synergy_data[pair] = {
-            'frequency': count,
-            'win_rate': win_rate
-        }
-
-    # Sorting card pairs by win rate for better insight
-    sorted_synergy_data = dict(sorted(synergy_data.items(), key=lambda item: item[1]['win_rate'], reverse=True))
-
-    for index, (cards, count_data) in enumerate(sorted_synergy_data.items()):
-        if count_data['frequency'] >= 800:
-            print(
-                f"{index + 1}. {cards[0]} and {cards[1]}: Frequency - {count_data['frequency']}, Win Rate - {count_data['win_rate']:.2f}%")
-
-
-# Analyzes the efficiency of packs based on the win rates of runs containing cards from those packs.
-def pack_efficiency_analysis(runs: list[dict], card_to_pack: dict) -> None:
-    pack_counts = defaultdict(int)
-    pack_win_counts = defaultdict(int)
-
-    for run in runs:
-        # Dictionary to keep track of cards from each pack in the current run
-        run_pack_counts = defaultdict(int)
-
-        for card in run['master_deck']:
-            # Get the card's pack
-            clean_card = del_upg(card)
-            pack_name = card_to_pack.get(clean_card)
-
-            if not pack_name:  # Skip cards that can't be associated with a pack
-                continue
-
-            # Increment the count for this pack for the current run
-            run_pack_counts[pack_name] += 1
-
-        # Update the global pack counts with the counts from this run
-        for pack, count in run_pack_counts.items():
-            pack_counts[pack] += count
-            if run.get('victory', False):
-                pack_win_counts[pack] += count
-
-    # Calculate the win rates
-    pack_win_rates = {}
-    for pack, count in pack_counts.items():
-        win_count = pack_win_counts.get(pack, 0)
-        pack_win_rates[pack] = (win_count / count if count > 0 else 0.0, make_ratio(win_count, count))
-
-    # Sort packs by win rate
-    sorted_packs = sorted(pack_win_rates.items(), key=lambda x: x[1][0], reverse=True)
-
-    # Display results
-    for pack, (win_rate_percentage, win_rate_str) in sorted_packs:
-        print(f"{del_prefix(pack)}: {win_rate_str}")
-
-
 def count_upgraded_cards(runs: list[dict]) -> dict:
     card_upgrade_counts = defaultdict(int)
 
@@ -599,27 +517,25 @@ def upgraded_card_win_rate_analysis(runs: list[dict]) -> dict:
             if run.get('victory', False):
                 upgrade_win_counts[upgraded_card] += 1
 
-    analysis = {}
-    for card, freq in frequently_upgraded.items():
+    insights = {
+        "Card Upgrades": {
+            "description": "Analyzes upgrade frequency and win rates for cards.",
+            "headers": ["Card", "Upgrade Frequency", "Upgrade Win Rate", "General Win Rate"],
+            "data": []
+        }
+    }
+
+    sorted_analysis = dict(sorted(frequently_upgraded.items(), key=lambda item: item[1], reverse=True))
+
+    for card, freq in sorted_analysis.items():
+        if freq < 350:
+            continue
         upgrade_win_rate = make_ratio(upgrade_win_counts[card], upgrade_total_counts[card])
         general_win_rate = make_ratio(card_win_counts[card], card_total_counts[card])
-        analysis[card] = {
-            "upgrade_frequency": freq,
-            "upgrade_win_rate": upgrade_win_rate,
-            "general_win_rate": general_win_rate
-        }
 
-    # Sorting by upgrade frequency for better insight
-    sorted_analysis = dict(sorted(analysis.items(), key=lambda item: item[1]['upgrade_frequency'], reverse=True))
+        insights["Card Upgrades"]["data"].append([del_prefix(card), freq, upgrade_win_rate, general_win_rate])
 
-    for card, stats in sorted_analysis.items():
-        if stats['upgrade_frequency'] < 350:
-            continue
-        print(f"{card}: Upgraded {stats['upgrade_frequency']} times")
-        print(f"\tWin Rate when upgraded: {stats['upgrade_win_rate']}")
-        print(f"\tGeneral Win Rate: {stats['general_win_rate']}\n")
-
-    return sorted_analysis
+    return insights
 
 
 def median_health_before_rest(runs: List[Dict[str, any]]) -> Dict[int, float]:
