@@ -880,61 +880,6 @@ def win_rate_deviation_from_average_by_asc(runs: list[dict]) -> dict:
     return insights
 
 
-def win_rate_deviation_by_ascension_and_pack_sorted(runs: List[Dict[str, Any]]) -> Dict[str, Dict[int, str]]:
-    pack_stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
-    asc_level_stats = defaultdict(lambda: {'wins': 0, 'total': 0})
-
-    for run in runs:
-        asc_level = run.get('ascension_level', 0)
-        packs = run.get('currentPacks', '').split(',')
-        victory = run.get('victory', False)
-
-        asc_level_stats[asc_level]['total'] += 1
-        if victory:
-            asc_level_stats[asc_level]['wins'] += 1
-
-        for pack in packs:
-            pack_stats[pack][asc_level]['total'] += 1
-            if victory:
-                pack_stats[pack][asc_level]['wins'] += 1
-
-    average_win_rates_by_asc = {}
-    for asc_level, data in asc_level_stats.items():
-        average_win_rates_by_asc[asc_level] = data['wins'] / data['total'] if data['total'] > 0 else 0
-
-    win_rate_deviation_by_pack = defaultdict(dict)
-
-    for pack, asc_data in pack_stats.items():
-        for asc_level, data in asc_data.items():
-            win_rate = data['wins'] / data['total'] if data['total'] > 0 else 0
-            deviation = win_rate - average_win_rates_by_asc[asc_level]
-            sign = '+' if deviation > 0 else ''
-            win_rate_deviation_by_pack[pack][asc_level] = f"{sign}{deviation:.2%}"
-
-    # Sorting packs by the difference in win rate deviation between A0 and A20
-    sorted_packs = sorted(win_rate_deviation_by_pack.keys(),
-                          key=lambda p: abs(float(win_rate_deviation_by_pack[p].get(0, "0%").rstrip('%')) -
-                                            float(win_rate_deviation_by_pack[p].get(20, "0%").rstrip('%'))),
-                          reverse=True)
-
-    # Print the results
-    for pack in sorted_packs:
-        a0_deviation = win_rate_deviation_by_pack[pack].get(0, "N/A")
-        a20_deviation = win_rate_deviation_by_pack[pack].get(20, "N/A")
-
-        # Calculate the difference between A0 and A20
-        if a0_deviation != "N/A" and a20_deviation != "N/A":
-            diff_deviation = float(a0_deviation.rstrip('%')) - float(a20_deviation.rstrip('%'))
-            sign = '+' if diff_deviation > 0 else ''
-            diff_deviation_str = f"{sign}{diff_deviation:.2f}%"
-        else:
-            diff_deviation_str = "N/A"
-
-        print(f"{del_prefix(pack)}, Difference: 0/20: {diff_deviation_str}, A0: {a0_deviation}, A20: {a20_deviation}")
-
-    return win_rate_deviation_by_pack
-
-
 # Pick rate deviation of pack average by card (excluding special cards)
 def calculate_card_pick_deviation_per_pack(runs: List[Dict], card_to_pack: Dict[str, str], card_to_rarity: dict) -> None:
     picked_counts = Counter()
