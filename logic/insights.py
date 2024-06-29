@@ -142,7 +142,7 @@ def count_most_common_players(runs: list[dict]) -> Dict:
     return insights
 
 
-def count_most_common_picked_hats(runs: list[dict]) -> None:
+def count_most_common_picked_hats(runs: list[dict]) -> Dict:
     picked_hat_counts = Counter()
 
     for data_dict in runs:
@@ -150,8 +150,19 @@ def count_most_common_picked_hats(runs: list[dict]) -> None:
         if picked_hat:
             picked_hat_counts[picked_hat] += 1
 
+    insights = {
+        "Hat pickrate": {
+            "description": "Shows the most frequently picked hats from the runs.",
+            "headers": ["Hat", "Count"],
+            "data": []
+        }
+    }
+
+    # Populate the data part of the insights dictionary
     for picked_hat, count in picked_hat_counts.most_common():
-        print(f"{del_prefix(picked_hat)}: {count}")
+        insights["Hat pickrate"]["data"].append([del_prefix(picked_hat), count])
+
+    return insights
 
 
 def count_pack_victory_rate(runs: list[dict]) -> None:
