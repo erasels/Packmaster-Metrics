@@ -37,7 +37,7 @@ def sum_filtered_packs(runs: list[dict]) -> Dict:
 
     insights = {
         "Blacklisted packs": {
-            "description": "Shows how often packs are blacklisted by unique hosts.",
+            "description": "Shows how often a pack is blacklisted by unique hosts.",
             "headers": ["Pack Name", "Filtered"],
             "data": data_rows
         }
@@ -72,7 +72,7 @@ def count_enabled_expansion_packs(runs: list[dict]) -> Dict:
 
 
 # Counts the number of times each pack was picked and prints the results.
-def count_pack_picks(runs: list[dict]) -> None:
+def count_pack_picks(runs: list[dict]) -> Dict:
     picked_counts = Counter()
     not_picked_counts = Counter()
     result = []
@@ -93,19 +93,27 @@ def count_pack_picks(runs: list[dict]) -> None:
         not_picked_count = not_picked_counts[choice]
         total_count = picked_count + not_picked_count
 
-        # Calculate pick rate
+        # Calculate pick rate and format to 2 decimal places
         if total_count > 0:
-            pick_rate = picked_count / total_count
+            pick_rate = f"{(picked_count / total_count) * 100:.2f}%"
         else:
-            pick_rate = 0.0
+            pick_rate = "0.00%"
 
-        result.append((choice, picked_count, not_picked_count, pick_rate))
+        # Append the processed data
+        result.append([del_prefix(choice), picked_count, total_count, pick_rate])
 
-    # Sort the results by pick rate in descending order
-    sorted_result = sorted(result, key=lambda x: x[3], reverse=True)
+    # Sort the results by pick rate (convert string percentage back to float for sorting)
+    sorted_result = sorted(result, key=lambda x: float(x[3][:-1]), reverse=True)
 
-    for choice, picked_count, not_picked_count, pick_rate in sorted_result:
-        print(f"{del_prefix(choice)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
+    insights_dict = {
+        "Pack pickrate": {
+            "description": "Shows the pack pick rate.",
+            "headers": ["Pack Name", "Picked Count", "Total Count", "Pick Rate"],
+            "data": sorted_result
+        }
+    }
+
+    return insights_dict
 
 
 def count_most_common_players(runs: list[dict]) -> None:
