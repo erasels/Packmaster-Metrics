@@ -165,7 +165,7 @@ def count_most_common_picked_hats(runs: list[dict]) -> Dict:
     return insights
 
 
-def count_pack_victory_rate(runs: list[dict]) -> None:
+def count_pack_victory_rate(runs: list[dict]) -> Dict:
     pack_wins = {}
     pack_runs = {}
 
@@ -184,10 +184,22 @@ def count_pack_victory_rate(runs: list[dict]) -> None:
         reverse=True
     )
 
+    insights = {
+        "Pack winrate": {
+            "description": "Shows the win rate for each pack.",
+            "headers": ["Pack", "Runs Won", "Total Runs", "Win Rate"],
+            "data": []
+        }
+    }
+
     for pack in sorted_packs:
         wins = pack_wins[pack]
         total_runs = pack_runs.get(pack, 0)
-        print(f"{del_prefix(pack)}: {make_ratio(wins, total_runs)}")
+        pack_display_name = del_prefix(pack)
+        win_rate = make_ratio(wins, total_runs)
+        insights["Pack winrate"]["data"].append([pack_display_name, wins, total_runs, win_rate])
+
+    return insights
 
 
 # Count card picks of current run cards (counts upgraded cards seperately)
