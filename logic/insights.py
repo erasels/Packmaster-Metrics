@@ -47,7 +47,7 @@ def sum_filtered_packs(runs: list[dict]) -> Dict:
 
 
 # Counts the number of runs with enabledExpansionPacks and prints the ratio.
-def count_enabled_expansion_packs(runs: list[dict]) -> None:
+def count_enabled_expansion_packs(runs: list[dict]) -> Dict:
     enabled_count = 0
     total_count = len(runs)
 
@@ -55,7 +55,20 @@ def count_enabled_expansion_packs(runs: list[dict]) -> None:
         if data_dict.get("enabledExpansionPacks"):
             enabled_count += 1
 
-    print(make_ratio(enabled_count, total_count))
+    ratio = make_ratio(enabled_count, total_count)
+
+    # Construct the insights dictionary for this particular analysis
+    insights = {
+        "ExpansionPackUsage": {
+            "description": "This sheet shows the number and percentage of runs with expansion packs enabled.",
+            "headers": ["Enabled Expansion Packs", "Total Runs", "Percentage Enabled"],
+            "data": [
+                [enabled_count, total_count, ratio]
+            ]
+        }
+    }
+
+    return insights
 
 
 # Counts the number of runs with enabledExpansionPacks for each host and prints the ratio.
