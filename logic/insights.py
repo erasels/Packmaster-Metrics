@@ -737,7 +737,7 @@ def card_gem_synergies(runs: List[Dict[str, Any]]) -> Dict[str, int]:
     return sorted_results
 
 
-def win_rate_by_ascension_and_pack(runs: List[Dict[str, Any]]) -> Dict[str, Dict[int, str]]:
+def win_rate_by_ascension_and_pack(runs: list[dict]) -> dict:
     stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
 
     for run in runs:
@@ -757,15 +757,23 @@ def win_rate_by_ascension_and_pack(runs: List[Dict[str, Any]]) -> Dict[str, Dict
             win_rate = make_ratio(data['wins'], data['total'])
             win_rate_by_pack[pack][asc_level] = win_rate
 
-    # Print the results
-    for pack, asc_data in win_rate_by_pack.items():
-        print(f"Pack: {del_prefix(pack)}")
-        for asc_level in range(0, 21):
-            if asc_level in asc_data:
-                print(f"Ascension {asc_level}: {asc_data[asc_level]}")
-        print("\n")
+    insight_sheet = {
+        "Win rate by pack and asc": {
+            "description": "Win rates by card pack and ascension level.",
+            "headers": ["Pack", "Ascension Level", "Win Rate"],
+            "data": []
+        }
+    }
 
-    return win_rate_by_pack
+    for pack, asc_data in win_rate_by_pack.items():
+        if pack:
+            for asc_level in range(0, 21):
+                if asc_level in asc_data:
+                    insight_sheet["Win rate by pack and asc"]["data"].append([
+                        del_prefix(pack), asc_level, asc_data[asc_level]
+                    ])
+
+    return insight_sheet
 
 
 def win_rate_deviation_by_ascension_and_pack(runs: List[Dict[str, Any]]) -> Dict[str, Dict[int, str]]:
