@@ -34,6 +34,7 @@ def write_insight_to_file(insights, output_directory="insight_files"):
     os.makedirs(output_directory, exist_ok=True)
 
     for sheet_name, details in insights.items():
+        print(f"Writing {sheet_name} to file.")
         # Prepare the file path
         file_path = os.path.join(output_directory, f"{sheet_name}.txt")
 
