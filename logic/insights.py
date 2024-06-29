@@ -105,7 +105,7 @@ def count_pack_picks(runs: list[dict]) -> dict:
     # Sort the results by pick rate
     sorted_result = sorted(result, key=lambda x: float(x[3]), reverse=True)
 
-    insights_dict = {
+    insights = {
         "Pack pickrate": {
             "description": "Shows the pack pick rate.",
             "headers": ["Pack Name", "Picked", "Total", "Pick Rate"],
@@ -113,7 +113,7 @@ def count_pack_picks(runs: list[dict]) -> dict:
         }
     }
 
-    return insights_dict
+    return insights
 
 
 def count_most_common_players(runs: list[dict]) -> dict:
@@ -476,7 +476,7 @@ def count_median_turn_length_per_enemy(runs: list[dict]) -> dict:
     return insights
 
 
-def count_upgraded_cards(runs: list[dict]) -> dict:
+def _count_upgraded_cards(runs: list[dict]) -> dict:
     card_upgrade_counts = defaultdict(int)
 
     for run in runs:
@@ -492,7 +492,7 @@ def count_upgraded_cards(runs: list[dict]) -> dict:
 
 
 def upgraded_card_win_rate_analysis(runs: list[dict]) -> dict:
-    frequently_upgraded = count_upgraded_cards(runs)
+    frequently_upgraded = _count_upgraded_cards(runs)
 
     # Count the number of runs where the card was upgraded and won
     upgrade_win_counts = defaultdict(int)
@@ -723,7 +723,7 @@ def win_rate_by_ascension_and_pack(runs: list[dict]) -> dict:
             win_rate = make_ratio(data['wins'], data['total'])
             win_rate_by_pack[pack][asc_level] = win_rate
 
-    insight_sheet = {
+    insight = {
         "Win rate by pack and asc": {
             "description": "Win rates by card pack and ascension level.",
             "headers": ["Pack", "Ascension Level", "Win Rate"],
@@ -735,11 +735,11 @@ def win_rate_by_ascension_and_pack(runs: list[dict]) -> dict:
         if pack:
             for asc_level in range(0, 21):
                 if asc_level in asc_data:
-                    insight_sheet["Win rate by pack and asc"]["data"].append([
+                    insight["Win rate by pack and asc"]["data"].append([
                         del_prefix(pack), asc_level, asc_data[asc_level]
                     ])
 
-    return insight_sheet
+    return insight
 
 
 def win_rate_deviation_between_asc(runs: list[dict]) -> dict:
