@@ -250,8 +250,8 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: d
     return insights
 
 
-def count_win_rates(runs: list[dict]) -> None:
-    # Create a dictionary to store wins and total runs per ascension level
+# Create a dictionary to store wins and total runs per ascension level
+def count_win_rates_per_asc(runs: list[dict]) -> dict:
     ascension_stats = {}
     all_stats = {"wins": 0, "total_runs": 0}
 
@@ -275,14 +275,29 @@ def count_win_rates(runs: list[dict]) -> None:
     # Sort ascension levels in ascending order
     sorted_ascension_levels = sorted(ascension_stats.keys(), key=lambda x: int(x))
 
-    print(
-        f"Total win rate: {make_ratio(all_stats['wins'], all_stats['total_runs'])}")
-    # Calculate and print win rates per ascension level (sorted)
+    insights = {
+        "Winrate": {
+            "description": "Shows win rate per ascension level and overall.",
+            "headers": ["Ascension Level", "Won", "Total", "Win Rate"],
+            "data": []
+        }
+    }
+
+    # Overall win rate calculation
+    total_win_rate = make_ratio(all_stats['wins'], all_stats['total_runs'])
+    insights["Winrate"]["data"].append(
+        ["Overall", all_stats['wins'], all_stats['total_runs'], total_win_rate]
+    )
+
+    # Win rates per ascension level
     for ascension_level in sorted_ascension_levels:
         stats = ascension_stats[ascension_level]
-        wins = stats["wins"]
-        total_runs = stats["total_runs"]
-        print(f"Win rate on ascension {ascension_level}: {make_ratio(wins, total_runs)}")
+        win_rate = make_ratio(stats["wins"], stats["total_runs"])
+        insights["Winrate"]["data"].append(
+            [f"Ascension {ascension_level}", stats["wins"], stats["total_runs"], win_rate]
+        )
+
+    return insights
 
 
 def count_median_deck_sizes(runs: list[dict]) -> None:
