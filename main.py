@@ -25,7 +25,5 @@ if __name__ == "__main__":
     card_to_rarity = load_data_from_json(os.path.join(data_path, "rarities.json"))
     card_to_pack = reverse_and_flatten_dict(pack_to_cards)
 
-    all_data_dict = single_key_merge(date_to_metrics)
+    all_data = mega_list_merge(date_to_metrics)
     del date_to_metrics
-    insights.count_average_win_rate_per_card_split_by_rarity(all_data_dict[""], card_to_pack, card_to_rarity)
-

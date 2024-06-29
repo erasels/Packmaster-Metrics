@@ -76,11 +76,11 @@ def round_date_keys(input_dict, level):
     return merged_dict
 
 
-def single_key_merge(input_dict):
+def mega_list_merge(input_dict):
     mega_list = []
     for data_list in input_dict.values():
         mega_list.extend(data_list)
-    return {"": mega_list}
+    return mega_list
 
 
 # To be used on the pack_to_cards dict to reverse it into cards to pack
