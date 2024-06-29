@@ -658,7 +658,7 @@ def gem_impact_on_win_rate(runs: list[dict]) -> dict:
     return insights
 
 
-def gem_count_vs_win_rate(runs: List[Dict[str, Any]]) -> Dict[int, str]:
+def gem_count_vs_win_rate(runs: list[dict]) -> dict:
     gem_count_to_total_runs = defaultdict(int)
     gem_count_to_wins = defaultdict(int)
 
@@ -682,21 +682,25 @@ def gem_count_vs_win_rate(runs: List[Dict[str, Any]]) -> Dict[int, str]:
             gem_count_to_wins[gem_count] += 1
 
     # Calculate win rates
-    results = {}
+    results = []
     for gem_count, total_runs in gem_count_to_total_runs.items():
         wins = gem_count_to_wins.get(gem_count, 0)
-        results[gem_count] = make_ratio(wins, total_runs)
+        win_rate = make_ratio(wins, total_runs)
+        results.append([gem_count, wins, total_runs, win_rate])
 
-    # Sorting results by gem count
-    sorted_results = dict(sorted(results.items()))
+    # Sort results by gem count
+    results.sort(key=lambda x: x[0])
 
-    # Printing the results
-    print("Win Rate by Number of Socketed Gems:")
-    for gem_count, win_rate in sorted_results.items():
-        print(f"{gem_count} gems: {win_rate}")
-    print("\n")
+    # Store the results in the desired structure
+    insights = {
+        "Gem Count vs Win Rate": {
+            "description": "Displays the win rate by number of socketed gems.",
+            "headers": ["Gem Count", "Wins", "Total", "Win Rate"],
+            "data": results
+        }
+    }
 
-    return sorted_results
+    return insights
 
 
 def card_gem_synergies(runs: List[Dict[str, Any]]) -> Dict[str, int]:
