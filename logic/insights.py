@@ -116,7 +116,7 @@ def count_pack_picks(runs: list[dict]) -> Dict:
     return insights_dict
 
 
-def count_most_common_players(runs: list[dict]) -> None:
+def count_most_common_players(runs: list[dict]) -> Dict:
     host_counts = Counter()
 
     for data_dict in runs:
@@ -126,9 +126,20 @@ def count_most_common_players(runs: list[dict]) -> None:
 
     most_common_hosts = host_counts.most_common()
 
+    insights = {
+        "Runs by host": {
+            "description": "Shows the most frequently occurring hosts that have appeared at least 20 times.",
+            "headers": ["Host", "Count"],
+            "data": []
+        }
+    }
+
+    # Populate the data list with hosts that meet the threshold
     for host, count in most_common_hosts:
         if count >= 20:
-            print(f"{host}: {count}")
+            insights["Runs by host"]["data"].append([host, count])
+
+    return insights
 
 
 def count_most_common_picked_hats(runs: list[dict]) -> None:
