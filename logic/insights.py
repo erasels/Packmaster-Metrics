@@ -231,18 +231,19 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: d
             pick_rate = 0.0
 
         result.append([card_to_rarity.get(choice, "Unknown"),
+                       del_prefix(card_to_pack.get(choice)),
                        del_prefix(choice),
                        picked_count,
                        not_picked_count + picked_count,
                        f"{pick_rate:.2%}"])
 
     # Sort the results by pick rate in descending order
-    sorted_result = sorted(result, key=lambda x: float(x[4][:-1]), reverse=True)
+    sorted_result = sorted(result, key=lambda x: float(x[5][:-1]), reverse=True)
 
     insights = {
         "Card pickrate": {
             "description": "Shows how often a card is picked when seen.",
-            "headers": ["Rarity", "Card", "Picked", "Total", "Pick Rate"],
+            "headers": ["Rarity", "Pack", "Card", "Picked", "Total", "Pick Rate"],
             "data": sorted_result
         }
     }
@@ -293,9 +294,7 @@ def count_win_rates_per_asc(runs: list[dict]) -> dict:
     for ascension_level in sorted_ascension_levels:
         stats = ascension_stats[ascension_level]
         win_rate = make_ratio(stats["wins"], stats["total_runs"])
-        insights["Winrate"]["data"].append(
-            [f"Ascension {ascension_level}", stats["wins"], stats["total_runs"], win_rate]
-        )
+        insights["Winrate"]["data"].append([f"Ascension {ascension_level}", stats["wins"], stats["total_runs"], win_rate])
 
     return insights
 
@@ -373,7 +372,7 @@ def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict, card_t
             total_runs = stats["total_runs"]
             win_rate = f"{stats['wins'] / total_runs:.2%}" if total_runs > 0 else "N/A"
             data.append([card_to_rarity.get(card, "Unknown"),
-                         card_to_pack.get(card),
+                         del_prefix(card_to_pack.get(card)),
                          del_prefix(card),
                          stats['wins'],
                          total_runs,
