@@ -434,7 +434,7 @@ def count_win_rate_per_picked_hat(runs: list[dict]) -> dict:
     return insights
 
 
-def count_median_turn_length_per_enemy(runs: list[dict], high_value_threshold: int = 200) -> None:
+def count_median_turn_length_per_enemy(runs: list[dict]) -> dict:
     # Create a dictionary to store the turn lengths for each enemy
     enemy_turn_lengths = {}
 
@@ -459,23 +459,21 @@ def count_median_turn_length_per_enemy(runs: list[dict], high_value_threshold: i
         key=lambda x: statistics.median(x[1]),
         reverse=True, )
 
-    low_value_results = []
-    high_value_results = []
+    insights = {
+        "Turn length": {
+            "description": "Median turn length per enemy.",
+            "headers": ["Enemy", "Median Turn Length", "Number of Fights"],
+            "data": []
+        }
+    }
 
-    for stat in sorted_results:
-        if len(enemy_turn_lengths[stat[0]]) < high_value_threshold:
-            low_value_results.append(stat)
-        else:
-            high_value_results.append(stat)
+    # Populate data for each enemy
+    for enemy, turn_lengths in sorted_results:
+        median_turn_length = statistics.median(turn_lengths)
+        insights["Turn length"]["data"].append(
+            [enemy, f"{median_turn_length} turns", f"{len(turn_lengths)} fights"])
 
-    # Calculate and print the median turn length per enemy
-    for enemy, turn_lengths in high_value_results:
-        median_turn_length = statistics.median(turn_lengths)
-        print(f"{enemy}: {median_turn_length} turns (from {len(turn_lengths)} fights)")
-    print(f"---- The following results have less than {high_value_threshold} recorded combats ----")
-    for enemy, turn_lengths in low_value_results:
-        median_turn_length = statistics.median(turn_lengths)
-        print(f"{enemy}: {median_turn_length} turns (from {len(turn_lengths)} fights)")
+    return insights
 
 
 # Turned out kind of useless, since popular packs have a heavy influence on this output. Prints the frequency of the pair and the total win rate with that pair in the deck.
