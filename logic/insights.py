@@ -300,7 +300,7 @@ def count_win_rates_per_asc(runs: list[dict]) -> dict:
     return insights
 
 
-def count_median_deck_sizes(runs: list[dict]) -> None:
+def count_median_deck_sizes(runs: list[dict]) -> dict:
     # Create a dictionary to store deck sizes of victorious runs per ascension level
     ascension_deck_sizes = {}
     total_deck_sizes = []
@@ -325,11 +325,22 @@ def count_median_deck_sizes(runs: list[dict]) -> None:
         key=lambda x: int(x) if x != "Unknown" else float("inf")
     )
 
-    print(f"Median deck size for any ascension: {statistics.median(total_deck_sizes)}")
-    # Calculate and print median deck size per ascension level (sorted)
+    data = [
+        ["Any", statistics.median(total_deck_sizes)]
+    ]
     for ascension_level in sorted_ascension_levels:
         median_size = statistics.median(ascension_deck_sizes[ascension_level])
-        print(f"Median deck size for ascension {ascension_level}: {median_size}")
+        data.append([ascension_level, median_size])
+
+    insights = {
+        "Median deck sizes": {
+            "description": "Shows median deck sizes per ascension level and total.",
+            "headers": ["Ascension Level", "Median Deck Size"],
+            "data": data
+        }
+    }
+
+    return insights
 
 
 def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict) -> None:
