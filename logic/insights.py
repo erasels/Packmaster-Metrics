@@ -391,7 +391,7 @@ def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict, card_t
 
 
 # This is bogus data for fun
-def count_win_rate_per_picked_hat(runs: list[dict]) -> None:
+def count_win_rate_per_picked_hat(runs: list[dict]) -> dict:
     # Create a dictionary to store the number of wins and total runs for each pickedHat
     picked_hat_stats = {}
 
@@ -414,11 +414,24 @@ def count_win_rate_per_picked_hat(runs: list[dict]) -> None:
                             key=lambda x: (x[1]["wins"] / x[1]["total_runs"] if x[1]["total_runs"] > 0 else 0.0),
                             reverse=True)
 
-    # Calculate and print the win rate for each pickedHat
+    data = []
+
     for picked_hat, stats in sorted_results:
         wins = stats["wins"]
         total_runs = stats["total_runs"]
-        print(f"{del_prefix(picked_hat)}: {make_ratio(wins, total_runs)}")
+        win_rate = (wins / total_runs) * 100 if total_runs > 0 else 0
+        data.append([picked_hat, wins, total_runs, f"{win_rate:.2f}"])
+
+    # Return insights in the required structure
+    insights = {
+        "Hat Statistics": {
+            "description": "Displays win rate statistics per hat picked in the game runs.",
+            "headers": ["Picked Hat", "Wins", "Total", "Win Rate"],
+            "data": data
+        }
+    }
+
+    return insights
 
 
 def count_median_turn_length_per_enemy(runs: list[dict], high_value_threshold: int = 200) -> None:
