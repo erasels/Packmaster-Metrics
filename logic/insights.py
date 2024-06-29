@@ -8,7 +8,7 @@ from logic.transformations import *
 
 
 # Counts the number of packs filtered by each player and prints the most common ones.
-def sum_filtered_packs(runs: list[dict]) -> Dict:
+def sum_filtered_packs(runs: list[dict]) -> dict:
     word_counts = Counter()
     host_word_counts = {}
 
@@ -47,7 +47,7 @@ def sum_filtered_packs(runs: list[dict]) -> Dict:
 
 
 # Counts the number of runs with enabledExpansionPacks and prints the ratio.
-def count_enabled_expansion_packs(runs: list[dict]) -> Dict:
+def count_enabled_expansion_packs(runs: list[dict]) -> dict:
     enabled_count = 0
     total_count = len(runs)
 
@@ -72,7 +72,7 @@ def count_enabled_expansion_packs(runs: list[dict]) -> Dict:
 
 
 # Counts the number of times each pack was picked and prints the results.
-def count_pack_picks(runs: list[dict]) -> Dict:
+def count_pack_picks(runs: list[dict]) -> dict:
     picked_counts = Counter()
     not_picked_counts = Counter()
     result = []
@@ -116,7 +116,7 @@ def count_pack_picks(runs: list[dict]) -> Dict:
     return insights_dict
 
 
-def count_most_common_players(runs: list[dict]) -> Dict:
+def count_most_common_players(runs: list[dict]) -> dict:
     host_counts = Counter()
 
     for data_dict in runs:
@@ -142,7 +142,7 @@ def count_most_common_players(runs: list[dict]) -> Dict:
     return insights
 
 
-def count_most_common_picked_hats(runs: list[dict]) -> Dict:
+def count_most_common_picked_hats(runs: list[dict]) -> dict:
     picked_hat_counts = Counter()
 
     for data_dict in runs:
@@ -165,7 +165,7 @@ def count_most_common_picked_hats(runs: list[dict]) -> Dict:
     return insights
 
 
-def count_pack_victory_rate(runs: list[dict]) -> Dict:
+def count_pack_victory_rate(runs: list[dict]) -> dict:
     pack_wins = {}
     pack_runs = {}
 
@@ -195,15 +195,14 @@ def count_pack_victory_rate(runs: list[dict]) -> Dict:
     for pack in sorted_packs:
         wins = pack_wins[pack]
         total_runs = pack_runs.get(pack, 0)
-        pack_display_name = del_prefix(pack)
         win_rate = make_ratio(wins, total_runs)
-        insights["Pack winrate"]["data"].append([pack_display_name, wins, total_runs, win_rate])
+        insights["Pack winrate"]["data"].append([del_prefix(pack), wins, total_runs, win_rate])
 
     return insights
 
 
 # Count card picks of current run cards (counts upgraded cards seperately)
-def count_card_pick_rate(runs: list[dict], card_to_pack: dict) -> None:
+def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> dict:
     picked_counts = Counter()
     not_picked_counts = Counter()
     result = []
@@ -231,13 +230,24 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict) -> None:
         else:
             pick_rate = 0.0
 
-        result.append((choice, picked_count, not_picked_count, pick_rate))
+        result.append([card_to_rarity.get(choice, "Unknown"),
+                       del_prefix(choice),
+                       picked_count,
+                       not_picked_count + picked_count,
+                       f"{pick_rate:.2%}"])
 
     # Sort the results by pick rate in descending order
-    sorted_result = sorted(result, key=lambda x: x[3], reverse=True)
+    sorted_result = sorted(result, key=lambda x: float(x[4][:-1]), reverse=True)
 
-    for choice, picked_count, not_picked_count, pick_rate in sorted_result:
-        print(f"{add_pack_prefix(choice, card_to_pack)}: {pick_rate:.2%} ({picked_count}/{not_picked_count + picked_count})")
+    insights = {
+        "Card pickrate": {
+            "description": "Shows how often a card is picked when seen.",
+            "headers": ["Rarity", "Card", "Picked", "Total", "Pick Rate"],
+            "data": sorted_result
+        }
+    }
+
+    return insights
 
 
 def count_win_rates(runs: list[dict]) -> None:
