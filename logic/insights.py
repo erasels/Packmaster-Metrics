@@ -286,7 +286,7 @@ def count_win_rates_per_asc(runs: list[dict]) -> dict:
         stats = ascension_stats[ascension_level]
         if stats["total_runs"] > 100:
             win_rate = make_ratio(stats["wins"], stats["total_runs"])
-            insights["Winrate"]["data"].append([f"Ascension {ascension_level}", stats["wins"], stats["total_runs"], win_rate])
+            insights["Winrate"]["data"].append([ascension_level, stats["wins"], stats["total_runs"], win_rate])
 
     return insights
 
