@@ -426,13 +426,12 @@ def count_win_rate_per_picked_hat(runs: list[dict]) -> dict:
     for picked_hat, stats in sorted_results:
         wins = stats["wins"]
         total_runs = stats["total_runs"]
-        win_rate = (wins / total_runs) * 100 if total_runs > 0 else 0
-        data.append([picked_hat, wins, total_runs, f"{win_rate:.2f}"])
+        win_rate = make_ratio(wins, total_runs)
+        data.append([del_prefix(picked_hat), wins, total_runs, win_rate])
 
-    # Return insights in the required structure
     insights = {
         "Hat Statistics": {
-            "description": "Displays win rate statistics per hat picked in the game runs.",
+            "description": "Win rate based on what hat was picked. This is bogus data.",
             "headers": ["Picked Hat", "Wins", "Total", "Win Rate"],
             "data": data
         }
