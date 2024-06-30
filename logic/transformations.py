@@ -17,5 +17,5 @@ def add_pack_prefix(cardName: str, card_to_pack: dict, keep_upgrade: bool = True
 
 
 def make_ratio(positive: int, total: int) -> str:
-    rate = positive / total if total > 0 else 0.0
-    return f"{rate:.2%} ({positive}/{total})"
+    rate = (positive / total) * 100 if total > 0 else 0.0
+    return f"{rate:.2f}"

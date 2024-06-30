@@ -1,4 +1,5 @@
 data/metrics
+insight_files/
 *.pkl
 *.pkl.bak
 .idea
