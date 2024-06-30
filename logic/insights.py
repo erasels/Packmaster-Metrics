@@ -259,7 +259,6 @@ def count_win_rates_per_asc(runs: list[dict]) -> dict:
     all_stats = {"wins": 0, "total_runs": 0}
 
     for data_dict in runs:
-        # Check if the dictionary contains a "victory" key
         if "victory" in data_dict:
             ascension_level = data_dict.get("ascension_level", 0)
             victory = data_dict["victory"]
@@ -292,11 +291,12 @@ def count_win_rates_per_asc(runs: list[dict]) -> dict:
         ["Overall", all_stats['wins'], all_stats['total_runs'], total_win_rate]
     )
 
-    # Win rates per ascension level
+    # Win rates per ascension level  (skipping ascs with less than 100 runs)
     for ascension_level in sorted_ascension_levels:
         stats = ascension_stats[ascension_level]
-        win_rate = make_ratio(stats["wins"], stats["total_runs"])
-        insights["Winrate"]["data"].append([f"Ascension {ascension_level}", stats["wins"], stats["total_runs"], win_rate])
+        if stats["total_runs"] > 100:
+            win_rate = make_ratio(stats["wins"], stats["total_runs"])
+            insights["Winrate"]["data"].append([f"Ascension {ascension_level}", stats["wins"], stats["total_runs"], win_rate])
 
     return insights
 
