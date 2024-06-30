@@ -478,7 +478,7 @@ def count_median_turn_length_per_enemy(runs: list[dict]) -> dict:
     for enemy, turn_lengths in sorted_results:
         median_turn_length = statistics.median(turn_lengths)
         insights["Turn length"]["data"].append(
-            [enemy, f"{median_turn_length} turns", f"{len(turn_lengths)} fights"])
+            [enemy, median_turn_length, len(turn_lengths)])
 
     return insights
 
