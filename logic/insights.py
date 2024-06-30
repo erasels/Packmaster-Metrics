@@ -221,21 +221,23 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: d
             not_picked_counts.update(not_picked)
 
     for choice, picked_count in picked_counts.items():
-        not_picked_count = not_picked_counts[choice]
-        total_count = picked_count + not_picked_count
+        rar = card_to_rarity.get(choice, "Unknown")
+        if rar != "Special":
+            not_picked_count = not_picked_counts[choice]
+            total_count = picked_count + not_picked_count
 
-        # Calculate pick rate
-        if total_count > 0:
-            pick_rate = picked_count / total_count
-        else:
-            pick_rate = 0.0
+            # Calculate pick rate
+            if total_count > 0:
+                pick_rate = make_ratio(picked_count, total_count)
+            else:
+                pick_rate = 0.0
 
-        result.append([card_to_rarity.get(choice, "Unknown"),
-                       del_prefix(card_to_pack.get(choice)),
-                       del_prefix(choice),
-                       picked_count,
-                       not_picked_count + picked_count,
-                       f"{pick_rate:.2f}"])
+            result.append([rar,
+                           del_prefix(card_to_pack.get(choice)),
+                           del_prefix(choice),
+                           picked_count,
+                           not_picked_count + picked_count,
+                           pick_rate])
 
     # Sort the results by pick rate in descending order
     sorted_result = sorted(result, key=lambda x: float(x[5]), reverse=True)
@@ -370,7 +372,7 @@ def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict, card_t
     for card, stats in sorted_card_stats:
         if card_to_pack.get(card) and stats["total_runs"] >= 50:
             total_runs = stats["total_runs"]
-            win_rate = f"{(stats['wins'] / total_runs)*100:.2f}" if total_runs > 0 else "N/A"
+            win_rate = f"{(stats['wins'] / total_runs) * 100:.2f}" if total_runs > 0 else "N/A"
             data.append([card_to_rarity.get(card, "Unknown"),
                          del_prefix(card_to_pack.get(card)),
                          del_prefix(card),
@@ -773,8 +775,8 @@ def win_rate_deviation_between_asc(runs: list[dict]) -> dict:
 
             insights_data.append([
                 del_prefix(pack),
-                f"{asc_0_winrate*100:.2f}",
-                f"{asc_20_winrate*100:.2f}",
+                f"{asc_0_winrate * 100:.2f}",
+                f"{asc_20_winrate * 100:.2f}",
                 f"{sign}{deviation:.2%}"
             ])
 
@@ -894,7 +896,8 @@ def calculate_card_pick_deviation(runs: list[dict], card_to_pack: dict, card_to_
             "description": "Deviation of card pick rates from their pack averages.",
             "headers": ["Pack", "Card", "Pick Rate", "Pack Average", "Deviation"],
             "data": [
-                [del_prefix(card_to_pack[card]), del_prefix(card), f"{card_pick_rates[card]*100:.2f}", f"{pack_average_pick_rates[card_to_pack[card]]*100:.2f}", f"{deviation:.2%}"]
+                [del_prefix(card_to_pack[card]), del_prefix(card), f"{card_pick_rates[card] * 100:.2f}",
+                 f"{pack_average_pick_rates[card_to_pack[card]] * 100:.2f}", f"{deviation:.2%}"]
                 for card, deviation in sorted(card_deviations.items(), key=lambda x: x[1], reverse=True)
             ]
         }
