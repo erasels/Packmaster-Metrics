@@ -606,8 +606,9 @@ def smith_vs_rest_ratio(runs: list[dict]) -> dict:
 
     for ascension in sorted(ascension_choices.keys()):
         choices = ascension_choices[ascension]
-        ratio = choices['SMITH'] / choices['REST'] if choices['REST'] > 0 else 0
-        data.append([ascension, choices['SMITH'], choices['REST'], f"{ratio:.2f}"])
+        if (choices['SMITH'] + choices['REST']) > 100:  # Only show ascs with a combined total of 100+ picked
+            ratio = choices['SMITH'] / choices['REST'] if choices['REST'] > 0 else 0
+            data.append([ascension, choices['SMITH'], choices['REST'], f"{ratio:.2f}"])
 
     # Format into the insights structure
     insights = {
