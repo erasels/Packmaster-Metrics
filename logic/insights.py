@@ -60,8 +60,8 @@ def count_enabled_expansion_packs(runs: list[dict]) -> dict:
     # Construct the insights dictionary for this particular analysis
     insights = {
         "Expansionpack Usage": {
-            "description": "Shows the number and percentage of runs with expansion packs enabled.",
-            "headers": ["Enabled Expansion Packs", "Total Runs", "Percentage Enabled"],
+            "description": "Shows the ratio of runs with expansion packs enabled.",
+            "headers": ["Run with", "Total", "Percentage Enabled"],
             "data": [
                 [enabled_count, total_count, ratio]
             ]
