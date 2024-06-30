@@ -155,7 +155,7 @@ def count_most_common_picked_hats(runs: list[dict]) -> dict:
     # Populate the data part of the insights dictionary
     for picked_hat, count in picked_hat_counts.most_common():
         pick_rate = make_ratio(count, total_runs)
-        insights["Hat pickrate"]["data"].append([picked_hat, count, pick_rate])
+        insights["Hat pickrate"]["data"].append([del_prefix(picked_hat), count, pick_rate])
 
     return insights
 
