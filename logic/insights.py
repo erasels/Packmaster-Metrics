@@ -192,7 +192,7 @@ def count_pack_victory_rate(runs: list[dict]) -> dict:
     insights = {
         "Pack winrate": {
             "description": "Shows the win rate for each pack.",
-            "headers": ["Pack", "Runs Won", "Total Runs", "Win Rate"],
+            "headers": ["Pack", "Wins", "Total", "Win Rate"],
             "data": []
         }
     }
