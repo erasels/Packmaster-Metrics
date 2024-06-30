@@ -733,7 +733,7 @@ def win_rate_by_ascension_and_pack(runs: list[dict]) -> dict:
 
     insight = {
         "Win rate by pack and asc": {
-            "description": "Win rates by card pack and ascension level.",
+            "description": "Win rates by pack and ascension level.",
             "headers": ["Pack", "Ascension Level", "Win Rate"],
             "data": []
         }
