@@ -696,7 +696,7 @@ def gem_count_vs_win_rate(runs: list[dict]) -> dict:
     # Store the results in the desired structure
     insights = {
         "Gem Count vs Win Rate": {
-            "description": "Displays the win rate by number of socketed gems.",
+            "description": "Displays the win rate by number of socketed gems in runs with Gems pack.",
             "headers": ["Gem Count", "Wins", "Total", "Win Rate"],
             "data": results
         }
