@@ -92,14 +92,7 @@ def count_pack_picks(runs: list[dict]) -> dict:
     for choice, picked_count in picked_counts.items():
         not_picked_count = not_picked_counts[choice]
         total_count = picked_count + not_picked_count
-
-        # Calculate pick rate and format to 2 decimal places
-        if total_count > 0:
-            pick_rate = f"{(picked_count / total_count) * 100:.2f}"
-        else:
-            pick_rate = "0.00"
-
-        # Append the processed data
+        pick_rate = make_ratio(picked_count, total_count)
         result.append([del_prefix(choice), picked_count, total_count, pick_rate])
 
     # Sort the results by pick rate
@@ -108,7 +101,7 @@ def count_pack_picks(runs: list[dict]) -> dict:
     insights = {
         "Pack pickrate": {
             "description": "Shows the pack pick rate.",
-            "headers": ["Pack Name", "Picked", "Total", "Pick Rate"],
+            "headers": ["Pack Name", "Picked", "Seen", "Pick Rate"],
             "data": sorted_result
         }
     }
@@ -161,10 +154,7 @@ def count_most_common_picked_hats(runs: list[dict]) -> dict:
 
     # Populate the data part of the insights dictionary
     for picked_hat, count in picked_hat_counts.most_common():
-        if total_runs > 0:
-            pick_rate = make_ratio(count, total_runs)
-        else:
-            pick_rate = 0.0
+        pick_rate = make_ratio(count, total_runs)
         insights["Hat pickrate"]["data"].append([picked_hat, count, pick_rate])
 
     return insights
@@ -230,12 +220,7 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: d
         if rar != "Special":
             not_picked_count = not_picked_counts[choice]
             total_count = picked_count + not_picked_count
-
-            # Calculate pick rate
-            if total_count > 0:
-                pick_rate = make_ratio(picked_count, total_count)
-            else:
-                pick_rate = 0.0
+            pick_rate = make_ratio(picked_count, total_count)
 
             result.append([rar,
                            del_prefix(card_to_pack.get(choice)),
@@ -250,7 +235,7 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: d
     insights = {
         "Card pickrate": {
             "description": "Shows how often a card is picked when seen.",
-            "headers": ["Rarity", "Pack", "Card", "Picked", "Total", "Pick Rate"],
+            "headers": ["Rarity", "Pack", "Card", "Picked", "Seen", "Pick Rate"],
             "data": sorted_result
         }
     }
