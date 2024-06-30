@@ -152,7 +152,7 @@ def count_most_common_picked_hats(runs: list[dict]) -> dict:
 
     insights = {
         "Hat pickrate": {
-            "description": "Shows the most frequently picked hats from the runs.",
+            "description": "Shows the amount of runs started with the different hats.",
             "headers": ["Hat", "Count"],
             "data": []
         }
