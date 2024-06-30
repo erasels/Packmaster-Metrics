@@ -129,7 +129,7 @@ def count_most_common_players(runs: list[dict]) -> dict:
     insights = {
         "Runs by host": {
             "description": "Shows the most frequently occurring hosts that have appeared at least 20 times.",
-            "headers": ["Host", "Count"],
+            "headers": ["Host", "Runs"],
             "data": []
         }
     }
