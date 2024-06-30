@@ -1,4 +1,5 @@
 data/metrics
+credentials.json
 insight_files/
 *.pkl
 *.pkl.bak
