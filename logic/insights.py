@@ -761,13 +761,12 @@ def win_rate_deviation_between_asc(runs: list[dict]) -> dict:
             asc_20_winrate = asc_20_data['wins'] / asc_20_data['total'] if asc_20_data['total'] > 0 else 0
 
             deviation = asc_0_winrate - asc_20_winrate
-            sign = '+' if deviation > 0 else ''
 
             insights_data.append([
                 del_prefix(pack),
                 f"{asc_0_winrate * 100:.2f}",
                 f"{asc_20_winrate * 100:.2f}",
-                f"{sign}{deviation:.2%}"
+                f"{deviation:.2%}"
             ])
 
     insights_data.sort(key=lambda x: float(x[3][:-1]), reverse=True)
@@ -818,15 +817,13 @@ def win_rate_deviation_from_average_by_asc(runs: list[dict]) -> dict:
             # Calculate deviations from the overall average win rates
             deviation_0 = pack_asc_0_winrate - average_win_rates_by_asc.get(0, 0)
             deviation_20 = pack_asc_20_winrate - average_win_rates_by_asc.get(20, 0)
-            sign_0 = '+' if deviation_0 > 0 else ''
-            sign_20 = '+' if deviation_20 > 0 else ''
 
             insights_data.append([
                 del_prefix(pack),
                 f"{pack_asc_0_winrate * 100:.2f}",
                 f"{pack_asc_20_winrate * 100:.2f}",
-                f"{sign_0}{deviation_0:.2%}",
-                f"{sign_20}{deviation_20:.2%}"
+                f"{deviation_0:.2%}",
+                f"{deviation_20:.2%}"
             ])
 
     insights = {
