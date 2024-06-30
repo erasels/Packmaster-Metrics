@@ -646,7 +646,7 @@ def gem_impact_on_win_rate(runs: list[dict]) -> dict:
 
     insights = {
         "Gem Impact on Win Rate": {
-            "description": "Shows the impact of gems on win rates in a game.",
+            "description": "Shows win rates of runs with gems pack based on having gems slotted in or not.",
             "headers": ["Condition", "Wins", "Total", "Win Rate"],
             "data": [
                 ["With Gems", wins_with_gems, total_runs_with_gems, win_rate_with_gems],
