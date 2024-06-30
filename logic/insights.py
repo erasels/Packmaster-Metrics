@@ -778,6 +778,8 @@ def win_rate_deviation_between_asc(runs: list[dict]) -> dict:
                 f"{sign}{deviation:.2%}"
             ])
 
+    insights_data.sort(key=lambda x: float(x[3][:-1]), reverse=True)
+
     insights = {
         "Win rate deviation between asc": {
             "description": "Comparative win rates and deviation for packs between ascension level 0 and 20.",
