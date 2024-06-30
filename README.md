@@ -3,8 +3,7 @@ This repository contains the scripts that I use to generate insights into the me
 [Packmaster](https://github.com/erasels/PackmasterCharacter) character runs.  
   
 As of the 29th of June 2024 we have a little over 800k run metrics collected so there are some interesting conclusions 
-to be drawn once the information is properly sanitized and evaluated. The main point of conversation around these insights  
-happens in [this discord thread](https://discord.com/channels/309399445785673728/1154170413472022579).  
+to be drawn once the information is properly sanitized and evaluated. The main point of conversation around these insights happens in [this discord thread](https://discord.com/channels/309399445785673728/1154170413472022579).  
   
 I upload the data into a google sheet that allows for easy exploration, found [here](https://docs.google.com/spreadsheets/d/146GPNf1aCHj5URk_oMkYS064HuRcP4vgbtCAkQ9NVWo/edit?gid=101337378#gid=101337378)
   
