@@ -522,7 +522,7 @@ def upgraded_card_win_rate_analysis(runs: list[dict]) -> dict:
     insights = {
         "Card Upgrades": {
             "description": "Analyzes upgrade frequency and win rates for cards.",
-            "headers": ["Card", "Upgrade Frequency", "Upgrade Win Rate", "General Win Rate"],
+            "headers": ["Card", "Amount upgraded", "Win rate when upgraded", "General Win rate"],
             "data": []
         }
     }
