@@ -317,7 +317,7 @@ def count_median_deck_sizes(runs: list[dict]) -> dict:
     )
 
     data = [
-        ["Any", statistics.median(total_deck_sizes)]
+        ["Overall", statistics.median(total_deck_sizes)]
     ]
     for ascension_level in sorted_ascension_levels:
         median_size = statistics.median(ascension_deck_sizes[ascension_level])
