@@ -325,7 +325,7 @@ def count_median_deck_sizes(runs: list[dict]) -> dict:
 
     insights = {
         "Median deck sizes": {
-            "description": "Shows median deck sizes per ascension level and total.",
+            "description": "Shows median deck sizes of won runs per ascension level and total.",
             "headers": ["Ascension Level", "Median Deck Size"],
             "data": data
         }

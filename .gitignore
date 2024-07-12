@@ -6,3 +6,4 @@ insight_files/
 .idea
 __pycache__
 experiment/
+sheets_integration/token.json
