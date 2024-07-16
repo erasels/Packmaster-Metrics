@@ -206,18 +206,14 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: d
         current_packs = set(data_dict.get("currentPacks", "").split(","))
         card_choices = data_dict.get("card_choices", [])
         for choice in card_choices:
-            picked = choice.get("picked")
-            not_picked = choice.get("not_picked", [])
-
-            if picked and card_to_pack.get(picked) in current_packs:
-                picked_counts.update([picked])
-
-            not_picked = [card for card in not_picked if card_to_pack.get(card) in current_packs]
+            picked = del_upg(choice.get("picked"))
+            not_picked = [del_upg(card) for card in choice.get("not_picked", [])]
+            picked_counts.update([picked])
             not_picked_counts.update(not_picked)
 
     for choice, picked_count in picked_counts.items():
         rar = card_to_rarity.get(choice, "Unknown")
-        if rar != "Special":
+        if rar != "Special" and card_to_pack.get(choice):
             not_picked_count = not_picked_counts[choice]
             total_count = picked_count + not_picked_count
             pick_rate = make_ratio(picked_count, total_count)
