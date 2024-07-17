@@ -62,20 +62,22 @@ def update_insights(insights: dict):
                         'cell': {
                             'userEnteredFormat': {
                                 'backgroundColor': {
-                                    'red': 1.0,
-                                    'green': 0.9,
-                                    'blue': 0.9
+                                    # I like blue header better :3
+                                    'red': 0.85,
+                                    'green': 0.85,
+                                    'blue': 1
                                 },
                                 'textFormat': {
                                     'bold': True
-                                }
+                                },
+                                'horizontalAlignment': 'CENTER'
                             }
                         },
                         'fields': 'userEnteredFormat(backgroundColor,textFormat)'
                     }
                 }
             ]
-
+            # Adds a default filter depending on if there's a Pack column
             if "Pack" in content['headers']:
                 pack_column_index = content['headers'].index("Pack")
                 format_requests.append({
@@ -178,7 +180,8 @@ def update_summary_sheet():
 
 def auth():
     creds = None
-    creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+    if os.path.exists('token.json'):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:

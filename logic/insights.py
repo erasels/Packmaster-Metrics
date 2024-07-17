@@ -38,7 +38,7 @@ def sum_filtered_packs(runs: list[dict]) -> dict:
     insights = {
         "Blacklisted packs": {
             "description": "Shows how often a pack is blacklisted by unique hosts.",
-            "headers": ["Pack Name", "Filtered"],
+            "headers": ["Pack", "Filtered"],
             "data": data_rows
         }
     }
@@ -101,7 +101,7 @@ def count_pack_picks(runs: list[dict]) -> dict:
     insights = {
         "Pack pickrate": {
             "description": "Shows the pack pick rate.",
-            "headers": ["Pack Name", "Picked", "Seen", "Pick Rate"],
+            "headers": ["Pack", "Picked", "Seen", "Pick Rate"],
             "data": sorted_result
         }
     }
@@ -562,8 +562,8 @@ def median_health_before_rest(runs: list[dict]) -> dict:
     # Create insights structure
     insights = {
         "Health before rest": {
-            "description": "Median health ratios before rest across different ascension levels.",
-            "headers": ["Ascension Level", "Median Health Before Rest"],
+            "description": "Median HP% before rest across different ascension levels.",
+            "headers": ["Ascension Level", "Median HP% Before Rest"],
             "data": data
         }
     }
@@ -597,8 +597,8 @@ def smith_vs_rest_ratio(runs: list[dict]) -> dict:
     # Format into the insights structure
     insights = {
         "SmithVsRest": {
-            "description": "Shows the ratio of smiths to rests at campsites.",
-            "headers": ["Ascension Level", "Number of Smiths", "Number of Rests", "Smith to Rest Ratio"],
+            "description": "Shows the smith-to-rest ratio at campsites.",
+            "headers": ["Ascension Level", "Number of Smiths", "Number of Rests", "Smith-to-Rest Ratio"],
             "data": data
         }
     }
@@ -686,7 +686,7 @@ def gem_count_vs_win_rate(runs: list[dict]) -> dict:
     # Store the results in the desired structure
     insights = {
         "Gem Count vs Win Rate": {
-            "description": "Displays the win rate by number of socketed gems in runs with Gems pack.",
+            "description": "Shows win rates of runs with Gems pack based on number of socketed gems.",
             "headers": ["Gem Count", "Wins", "Total", "Win Rate"],
             "data": results
         }
