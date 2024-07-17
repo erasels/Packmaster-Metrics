@@ -9,7 +9,7 @@ from googleapiclient.errors import HttpError
 
 # Full access scope allows for reading and writing.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SPREADSHEET_ID = "146GPNf1aCHj5URk_oMkYS064HuRcP4vgbtCAkQ9NVWo"
+SPREADSHEET_ID = "1vXWjw_8aKNXZeZZMMTpCxPYUEi07M71wc_ywYUW_-Ko"
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 # Define file paths relative to the script location.
@@ -55,7 +55,9 @@ def update_insights(insights: dict):
                         'range': {
                             'sheetId': existing_sheets[sheet_name],
                             'startRowIndex': 1,
-                            'endRowIndex': 2
+                            'endRowIndex': 2,
+                            'startColumnIndex': 0,
+                            'endColumnIndex': len(content['headers'])
                         },
                         'cell': {
                             'userEnteredFormat': {
@@ -73,6 +75,46 @@ def update_insights(insights: dict):
                     }
                 }
             ]
+
+            if "Pack" in content['headers']:
+                pack_column_index = content['headers'].index("Pack")
+                format_requests.append({
+                    'setBasicFilter': {
+                        'filter': {
+                            'range': {
+                                'sheetId': existing_sheets[sheet_name],
+                                'startRowIndex': 1,
+                                'startColumnIndex': 0,
+                                'endColumnIndex': len(content['headers'])
+                            },
+                            'filterSpecs': [{
+                                'filterCriteria': {
+                                    'condition': {
+                                        'type': 'TEXT_NOT_CONTAINS',
+                                        'values': [{
+                                            'userEnteredValue': ":"
+                                        }]
+                                    }
+                                },
+                                'columnIndex': pack_column_index
+                            }]
+                        }
+                    }
+                })
+            else:
+                format_requests.append({
+                    'setBasicFilter': {
+                        'filter':{
+                            'range': {
+                                'sheetId': existing_sheets[sheet_name],
+                                'startRowIndex': 1,
+                                'startColumnIndex': 0,
+                                'endColumnIndex': len(content['headers'])
+                            } 
+                        }
+                    }
+                })
+
             # Apply formatting requests.
             if format_requests:
                 sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': format_requests}).execute()
@@ -136,8 +178,7 @@ def update_summary_sheet():
 
 def auth():
     creds = None
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+    creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
