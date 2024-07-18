@@ -317,22 +317,6 @@ def auth():
     return sheet
 
 
-if __name__ == "__main__":
-    # Only for testing, should be called from main.py
-    test_data = {
-        "Test": {
-            "description": "Description of what Sheet1 insight means",
-            "headers": ["Header1", "Header2", "Header3"],
-            "data": [
-                ["Data1", "Data2", "Data3"],
-                ["Data4", "Data5", "Data6"],
-            ]
-        }
-    }
-    # update_insights(test_data)
-    update_summary_sheet()
-
-
 def delete_all_sheets_except_first(spreadsheet_id=SPREADSHEET_ID):
     sheet = auth()
     sheet_metadata = sheet.get(spreadsheetId=SPREADSHEET_ID).execute()
@@ -354,3 +338,19 @@ def delete_all_sheets_except_first(spreadsheet_id=SPREADSHEET_ID):
     sheet.batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
 
     print(f"Deleted {len(delete_requests)} sheet(s).")
+
+
+if __name__ == "__main__":
+    # Only for testing, should be called from main.py
+    test_data = {
+        "Test": {
+            "description": "Description of what Sheet1 insight means",
+            "headers": ["Header1", "Header2", "Header3"],
+            "data": [
+                ["Data1", "Data2", "Data3"],
+                ["Data4", "Data5", "Data6"],
+            ]
+        }
+    }
+    update_insights(test_data)
+    # update_summary_sheet()
