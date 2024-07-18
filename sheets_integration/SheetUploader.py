@@ -300,8 +300,8 @@ def pack_wr_by_asc_formatting(content: dict, sheet_id: int) -> list:
 
 def auth():
     creds = None
-    # if os.path.exists('token.json'):
-    creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
