@@ -1,5 +1,6 @@
 import datetime
 import os.path
+import time
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -33,7 +34,12 @@ def update_insights(insights: dict):
 
             # Only prepare addSheet request if sheet does not exist.
             if sheet_name not in existing_sheets:
-                requests = [{'addSheet': {'properties': {'title': sheet_name}}}]
+                requests = [{'addSheet': {'properties': {'title': sheet_name,
+                                                         'gridProperties': {
+                                                             'rowCount': len(content['data'])+2,
+                                                             'columnCount': len(content['headers'])
+                                                             }
+                                                         }}}]
                 response = sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': requests}).execute()
                 # Find the new sheetId from the response.
                 new_sheet_id = response['replies'][0]['addSheet']['properties']['sheetId']
@@ -55,24 +61,86 @@ def update_insights(insights: dict):
                         'range': {
                             'sheetId': existing_sheets[sheet_name],
                             'startRowIndex': 1,
-                            'endRowIndex': 2
+                            'endRowIndex': 2,
+                            'startColumnIndex': 0,
+                            'endColumnIndex': len(content['headers'])
                         },
                         'cell': {
                             'userEnteredFormat': {
                                 'backgroundColor': {
-                                    'red': 1.0,
-                                    'green': 0.9,
-                                    'blue': 0.9
+                                    # I like blue header better :3
+                                    'red': 0.85,
+                                    'green': 0.85,
+                                    'blue': 1
                                 },
                                 'textFormat': {
                                     'bold': True
-                                }
+                                },
+                                'horizontalAlignment': 'CENTER',
+                                'wrapStrategy': 'WRAP'
                             }
                         },
-                        'fields': 'userEnteredFormat(backgroundColor,textFormat)'
+                        'fields': 'userEnteredFormat(backgroundColor,textFormat,horizontalAlignment,wrapStrategy)'
+                    }
+                },
+                {
+                    "autoResizeDimensions": {
+                        "dimensions": {
+                            "sheetId": existing_sheets[sheet_name],
+                            "dimension": "COLUMNS",
+                            "startIndex": 0,
+                            "endIndex": len(content['headers'])
+                        }
                     }
                 }
             ]
+            # Adds a default filter depending on if there's a Pack column
+            if "Pack" in content['headers']:
+                pack_column_index = content['headers'].index("Pack")
+                format_requests.append({
+                    'setBasicFilter': {
+                        'filter': {
+                            'range': {
+                                'sheetId': existing_sheets[sheet_name],
+                                'startRowIndex': 1,
+                                'startColumnIndex': 0,
+                                'endColumnIndex': len(content['headers'])
+                            },
+                            'filterSpecs': [{
+                                'filterCriteria': {
+                                    'condition': {
+                                        'type': 'TEXT_NOT_CONTAINS',
+                                        'values': [{
+                                            'userEnteredValue': ":"
+                                        }]
+                                    }
+                                },
+                                'columnIndex': pack_column_index
+                            }]
+                        }
+                    }
+                })
+            else:
+                format_requests.append({
+                    'setBasicFilter': {
+                        'filter':{
+                            'range': {
+                                'sheetId': existing_sheets[sheet_name],
+                                'startRowIndex': 1,
+                                'startColumnIndex': 0,
+                                'endColumnIndex': len(content['headers'])
+                            } 
+                        }
+                    }
+                })
+
+            # This is to make the conditional formatting for the pack wr by asc, but it was so much code 
+            # I didn't want to have it be here in a conditional, so I moved it to a function
+            # I know this is kinda a jank way to handle it but ¯\_(ツ)_/¯
+            if content['headers'][0] == "Pack" and "Overall Win Rate" in content['headers'] and "A20" in content['headers']:
+                formatting_requests = pack_wr_by_asc_formatting(content, existing_sheets[sheet_name])
+                format_requests.extend(formatting_requests)
+
             # Apply formatting requests.
             if format_requests:
                 sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': format_requests}).execute()
@@ -84,6 +152,7 @@ def update_insights(insights: dict):
             sheet.values().update(
                 spreadsheetId=SPREADSHEET_ID, range=f"{sheet_name}!A1",
                 valueInputOption="USER_ENTERED", body=body).execute()
+            
 
     except HttpError as err:
         print(err)
@@ -91,16 +160,16 @@ def update_insights(insights: dict):
 
 def update_summary_sheet():
     sheet = auth()
-
+    
     try:
         # Get the titles and IDs of all existing sheets
         sheet_metadata = sheet.get(spreadsheetId=SPREADSHEET_ID).execute()
         sheets = sheet_metadata.get('sheets', [])
         existing_sheets = {s['properties']['title']: s['properties']['sheetId'] for s in sheets}
 
-        # Check if the "Summary" sheet exists, create if not
+        # Check if the "Summary" sheet exists, create and make first sheet if not
         if "Summary" not in existing_sheets:
-            requests = [{'addSheet': {'properties': {'title': "Summary"}}}]
+            requests = [{'addSheet': {'properties': {'title': "Summary",'index': 0}}}]
             response = sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': requests}).execute()
             summary_sheet_id = response['replies'][0]['addSheet']['properties']['sheetId']
             existing_sheets["Summary"] = summary_sheet_id
@@ -133,11 +202,106 @@ def update_summary_sheet():
     except HttpError as err:
         print(err)
 
+def pack_wr_by_asc_formatting(content: dict, sheet_id: int) -> list:
+    format_requests = []
+
+    # Conditional Formatting Rules
+    format_requests.append({
+        'addConditionalFormatRule': {
+            'rule': {
+                'ranges': [{
+                    'sheetId': sheet_id,
+                    'startRowIndex': 2,
+                    'startColumnIndex': 2,
+                    'endColumnIndex': len(content['headers'])
+                }],
+                'booleanRule': {
+                    'condition': {
+                        'type': 'CUSTOM_FORMULA',
+                        'values': [{
+                            'userEnteredValue': '=AND(C3<$B3, C3<>"N/A")'
+                        }]
+                    },
+                    'format': {
+                        'backgroundColor': {
+                            'red': 0.957,
+                            'green': 0.8,
+                            'blue': 0.8
+                        }
+                    }
+                }
+            },
+            'index': 0
+        }
+    })
+
+    format_requests.append({
+        'addConditionalFormatRule': {
+            'rule': {
+                'ranges': [{
+                    'sheetId': sheet_id,
+                    'startRowIndex': 2,
+                    'startColumnIndex': 2,
+                    'endColumnIndex': len(content['headers'])
+                }],
+                'booleanRule': {
+                    'condition': {
+                        'type': 'CUSTOM_FORMULA',
+                        'values': [{
+                            'userEnteredValue': '=AND(C3>$B3, C3<>"N/A")'
+                        }]
+                    },
+                    'format': {
+                        'backgroundColor': {
+                            'red': 0.718,
+                            'green': 0.882,
+                            'blue': 0.804
+                        }
+                    }
+                }
+            },
+            'index': 1
+        }
+    })
+
+    # Column Resizing
+    format_requests.append({
+        'updateDimensionProperties': {
+            'range': {
+                'sheetId': sheet_id,
+                'dimension': 'COLUMNS',
+                'startIndex': 2,  
+                'endIndex': len(content['headers'])  
+            },
+            'properties': {
+                'pixelSize': 50
+            },
+            'fields': 'pixelSize'
+        }
+    })
+    format_requests.append({
+        'repeatCell': {
+            'range': {
+                'sheetId': sheet_id,
+                'startRowIndex': 1,
+                'startColumnIndex': 1,
+                'endColumnIndex': len(content['headers'])
+            },
+            'cell': {
+                'userEnteredFormat': {
+                    'horizontalAlignment': 'CENTER'
+                }
+            },
+            'fields': 'userEnteredFormat.horizontalAlignment'
+        }
+    })
+
+    return format_requests
 
 def auth():
     creds = None
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+    #if os.path.exists('token.json'):
+    creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
@@ -167,3 +331,25 @@ if __name__ == "__main__":
     }
     #update_insights(test_data)
     update_summary_sheet()
+
+def delete_all_sheets_except_first(spreadsheet_id = SPREADSHEET_ID):
+    sheet = auth()
+    sheet_metadata = sheet.get(spreadsheetId=SPREADSHEET_ID).execute()
+    sheets = sheet_metadata.get('sheets', [])
+
+    # Prepare the delete requests
+    delete_requests = []
+    for sheet_obj in sheets[1:]: 
+        sheet_id = sheet_obj['properties']['sheetId']
+        delete_requests.append({
+            'deleteSheet': {
+                'sheetId': sheet_id
+            }
+        })
+
+    body = {
+        'requests': delete_requests
+    }
+    sheet.batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
+
+    print(f"Deleted {len(delete_requests)} sheet(s).")
