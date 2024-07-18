@@ -1,6 +1,7 @@
 import datetime
 import os.path
 import time
+from zoneinfo import ZoneInfo
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -36,9 +37,9 @@ def update_insights(insights: dict):
             if sheet_name not in existing_sheets:
                 requests = [{'addSheet': {'properties': {'title': sheet_name,
                                                          'gridProperties': {
-                                                             'rowCount': len(content['data'])+2,
+                                                             'rowCount': len(content['data']) + 2,
                                                              'columnCount': len(content['headers'])
-                                                             }
+                                                         }
                                                          }}}]
                 response = sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': requests}).execute()
                 # Find the new sheetId from the response.
@@ -123,13 +124,13 @@ def update_insights(insights: dict):
             else:
                 format_requests.append({
                     'setBasicFilter': {
-                        'filter':{
+                        'filter': {
                             'range': {
                                 'sheetId': existing_sheets[sheet_name],
                                 'startRowIndex': 1,
                                 'startColumnIndex': 0,
                                 'endColumnIndex': len(content['headers'])
-                            } 
+                            }
                         }
                     }
                 })
@@ -152,7 +153,6 @@ def update_insights(insights: dict):
             sheet.values().update(
                 spreadsheetId=SPREADSHEET_ID, range=f"{sheet_name}!A1",
                 valueInputOption="USER_ENTERED", body=body).execute()
-            
 
     except HttpError as err:
         print(err)
@@ -160,7 +160,7 @@ def update_insights(insights: dict):
 
 def update_summary_sheet():
     sheet = auth()
-    
+
     try:
         # Get the titles and IDs of all existing sheets
         sheet_metadata = sheet.get(spreadsheetId=SPREADSHEET_ID).execute()
@@ -169,7 +169,7 @@ def update_summary_sheet():
 
         # Check if the "Summary" sheet exists, create and make first sheet if not
         if "Summary" not in existing_sheets:
-            requests = [{'addSheet': {'properties': {'title': "Summary",'index': 0}}}]
+            requests = [{'addSheet': {'properties': {'title': "Summary", 'index': 0}}}]
             response = sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': requests}).execute()
             summary_sheet_id = response['replies'][0]['addSheet']['properties']['sheetId']
             existing_sheets["Summary"] = summary_sheet_id
@@ -177,7 +177,8 @@ def update_summary_sheet():
             summary_sheet_id = existing_sheets["Summary"]
 
         # Prepare data to write to "Summary" sheet
-        current_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
+        timezone = ZoneInfo("Europe/Paris")
+        current_time = datetime.datetime.now(timezone).strftime("%Y/%m/%d %H:%M %Z")
         values = [
             [f"Last updated: {current_time}"],  # First row with the update time
             [],  # Second row is empty
@@ -201,6 +202,7 @@ def update_summary_sheet():
 
     except HttpError as err:
         print(err)
+
 
 def pack_wr_by_asc_formatting(content: dict, sheet_id: int) -> list:
     format_requests = []
@@ -270,8 +272,8 @@ def pack_wr_by_asc_formatting(content: dict, sheet_id: int) -> list:
             'range': {
                 'sheetId': sheet_id,
                 'dimension': 'COLUMNS',
-                'startIndex': 2,  
-                'endIndex': len(content['headers'])  
+                'startIndex': 2,
+                'endIndex': len(content['headers'])
             },
             'properties': {
                 'pixelSize': 50
@@ -298,9 +300,10 @@ def pack_wr_by_asc_formatting(content: dict, sheet_id: int) -> list:
 
     return format_requests
 
+
 def auth():
     creds = None
-    #if os.path.exists('token.json'):
+    # if os.path.exists('token.json'):
     creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     # If there are no (valid) credentials available, let the user log in.
     if not creds or not creds.valid:
@@ -329,17 +332,18 @@ if __name__ == "__main__":
             ]
         }
     }
-    #update_insights(test_data)
+    # update_insights(test_data)
     update_summary_sheet()
 
-def delete_all_sheets_except_first(spreadsheet_id = SPREADSHEET_ID):
+
+def delete_all_sheets_except_first(spreadsheet_id=SPREADSHEET_ID):
     sheet = auth()
     sheet_metadata = sheet.get(spreadsheetId=SPREADSHEET_ID).execute()
     sheets = sheet_metadata.get('sheets', [])
 
     # Prepare the delete requests
     delete_requests = []
-    for sheet_obj in sheets[1:]: 
+    for sheet_obj in sheets[1:]:
         sheet_id = sheet_obj['properties']['sheetId']
         delete_requests.append({
             'deleteSheet': {
