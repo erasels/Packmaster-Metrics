@@ -24,6 +24,7 @@ if __name__ == "__main__":
         print(date_to_metrics.keys())
         save_data_to_pickle(data_file_path, date_to_metrics)
 
+
     print("Data is loaded.")
 
     pack_to_cards = load_data_from_json(os.path.join(data_path, "packCards.json"))
