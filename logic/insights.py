@@ -1,4 +1,5 @@
 import statistics
+import re
 from collections import Counter
 from itertools import combinations
 from collections import defaultdict
@@ -36,9 +37,9 @@ def sum_filtered_packs(runs: list[dict]) -> dict:
     data_rows = [[del_prefix(pack), count] for pack, count in sorted_packs]
 
     insights = {
-        "Blacklisted packs": {
-            "description": "Shows how often a pack is blacklisted by unique hosts.",
-            "headers": ["Pack Name", "Filtered"],
+        "Blacklisted Packs": {
+            "description": "How often a pack is blacklisted by unique hosts",
+            "headers": ["Pack", "Blacklisted"],
             "data": data_rows
         }
     }
@@ -59,9 +60,9 @@ def count_enabled_expansion_packs(runs: list[dict]) -> dict:
 
     # Construct the insights dictionary for this particular analysis
     insights = {
-        "Expansionpack Usage": {
-            "description": "Shows the ratio of runs with expansion packs enabled.",
-            "headers": ["Run with", "Total", "Percentage Enabled"],
+        "Expansion Pack Usage": {
+            "description": "Percentage of runs with expansion packs enabled",
+            "headers": ["Enabled", "Total Runs", "Percentage Enabled"],
             "data": [
                 [enabled_count, total_count, ratio]
             ]
@@ -99,9 +100,9 @@ def count_pack_picks(runs: list[dict]) -> dict:
     sorted_result = sorted(result, key=lambda x: float(x[3]), reverse=True)
 
     insights = {
-        "Pack pickrate": {
-            "description": "Shows the pack pick rate.",
-            "headers": ["Pack Name", "Picked", "Seen", "Pick Rate"],
+        "Pack Pick Rate": {
+            "description": "How often a pack is picked",
+            "headers": ["Pack", "Picked", "Seen", "Pick Rate"],
             "data": sorted_result
         }
     }
@@ -120,8 +121,8 @@ def count_most_common_players(runs: list[dict]) -> dict:
     most_common_hosts = host_counts.most_common()
 
     insights = {
-        "Runs by host": {
-            "description": "Shows the most frequently occurring hosts that have appeared at least 20 times.",
+        "Runs by Host": {
+            "description": "Number of runs for hosts with at least 20 runs",
             "headers": ["Host", "Runs"],
             "data": []
         }
@@ -130,7 +131,7 @@ def count_most_common_players(runs: list[dict]) -> dict:
     # Populate the data list with hosts that meet the threshold
     for host, count in most_common_hosts:
         if count >= 20:
-            insights["Runs by host"]["data"].append([host, count])
+            insights["Runs by Host"]["data"].append([host, count])
 
     return insights
 
@@ -145,9 +146,9 @@ def count_most_common_picked_hats(runs: list[dict]) -> dict:
 
     total_runs = len(runs)
     insights = {
-        "Hat pickrate": {
-            "description": "Shows the amount of runs started with the different hats.",
-            "headers": ["Hat", "Count", "Pick Rate (%)"],
+        "Hat Pick Rate": {
+            "description": "Pick rate for each hat",
+            "headers": ["Hat", "Count", "Pick Rate"],
             "data": []
         }
     }
@@ -155,7 +156,7 @@ def count_most_common_picked_hats(runs: list[dict]) -> dict:
     # Populate the data part of the insights dictionary
     for picked_hat, count in picked_hat_counts.most_common():
         pick_rate = make_ratio(count, total_runs)
-        insights["Hat pickrate"]["data"].append([del_prefix(picked_hat), count, pick_rate])
+        insights["Hat Pick Rate"]["data"].append([del_prefix(picked_hat), count, pick_rate])
 
     return insights
 
@@ -180,8 +181,8 @@ def count_pack_victory_rate(runs: list[dict]) -> dict:
     )
 
     insights = {
-        "Pack winrate": {
-            "description": "Shows the win rate for each pack.",
+        "Pack Win Rate": {
+            "description": "Win rate for each pack",
             "headers": ["Pack", "Wins", "Total", "Win Rate"],
             "data": []
         }
@@ -191,7 +192,7 @@ def count_pack_victory_rate(runs: list[dict]) -> dict:
         wins = pack_wins[pack]
         total_runs = pack_runs.get(pack, 0)
         win_rate = make_ratio(wins, total_runs)
-        insights["Pack winrate"]["data"].append([del_prefix(pack), wins, total_runs, win_rate])
+        insights["Pack Win Rate"]["data"].append([del_prefix(pack), wins, total_runs, win_rate])
 
     return insights
 
@@ -233,8 +234,8 @@ def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: d
     sorted_result = sorted(result, key=lambda x: float(x[5]), reverse=True)
 
     insights = {
-        "Card pickrate": {
-            "description": "Shows how often a card is picked when seen.",
+        "Card Pick Rate": {
+            "description": "How often a card is picked when offered as a card reward",
             "headers": ["Rarity", "Pack", "Card", "Picked", "Seen", "Pick Rate"],
             "data": sorted_result
         }
@@ -268,8 +269,8 @@ def count_win_rates_per_asc(runs: list[dict]) -> dict:
     sorted_ascension_levels = sorted(ascension_stats.keys(), key=lambda x: int(x))
 
     insights = {
-        "Winrate": {
-            "description": "Shows win rate per ascension level and overall.",
+        "Winrate by Ascension Level": {
+            "description": "Win rate for each ascension level",
             "headers": ["Ascension Level", "Won", "Total", "Win Rate"],
             "data": []
         }
@@ -277,7 +278,7 @@ def count_win_rates_per_asc(runs: list[dict]) -> dict:
 
     # Overall win rate calculation
     total_win_rate = make_ratio(all_stats['wins'], all_stats['total_runs'])
-    insights["Winrate"]["data"].append(
+    insights["Winrate by Ascension Level"]["data"].append(
         ["Overall", all_stats['wins'], all_stats['total_runs'], total_win_rate]
     )
 
@@ -286,7 +287,7 @@ def count_win_rates_per_asc(runs: list[dict]) -> dict:
         stats = ascension_stats[ascension_level]
         if stats["total_runs"] > 100:
             win_rate = make_ratio(stats["wins"], stats["total_runs"])
-            insights["Winrate"]["data"].append([ascension_level, stats["wins"], stats["total_runs"], win_rate])
+            insights["Winrate by Ascension Level"]["data"].append([ascension_level, stats["wins"], stats["total_runs"], win_rate])
 
     return insights
 
@@ -324,8 +325,8 @@ def count_median_deck_sizes(runs: list[dict]) -> dict:
         data.append([ascension_level, median_size])
 
     insights = {
-        "Median deck sizes": {
-            "description": "Shows median deck sizes of won runs per ascension level and total.",
+        "Median Deck Sizes": {
+            "description": "Median deck size of winning runs for each ascension level",
             "headers": ["Ascension Level", "Median Deck Size"],
             "data": data
         }
@@ -372,8 +373,8 @@ def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict, card_t
 
     # Return the insights data structure
     insights = {
-        "Winrate by card": {
-            "description": "Shows the win rate for each card.",
+        "Win Rate by Card": {
+            "description": "Win rate for each card",
             "headers": ["Rarity", "Pack", "Card", "Wins", "Total", "Win Rate"],
             "data": data
         }
@@ -415,8 +416,8 @@ def count_win_rate_per_picked_hat(runs: list[dict]) -> dict:
         data.append([del_prefix(picked_hat), wins, total_runs, win_rate])
 
     insights = {
-        "Hat Statistics": {
-            "description": "Win rate based on what hat was picked. This is bogus data.",
+        "Hat Win Rate": {
+            "description": "Win rate based on what hat was picked (this is bogus data)",
             "headers": ["Picked Hat", "Wins", "Total", "Win Rate"],
             "data": data
         }
@@ -451,8 +452,8 @@ def count_median_turn_length_per_enemy(runs: list[dict]) -> dict:
         reverse=True, )
 
     insights = {
-        "Turn length": {
-            "description": "Median turn length per enemy.",
+        "Turn Length": {
+            "description": "Median turn length for each enemy",
             "headers": ["Enemy", "Median Turn Length", "Number of Fights"],
             "data": []
         }
@@ -461,7 +462,7 @@ def count_median_turn_length_per_enemy(runs: list[dict]) -> dict:
     # Populate data for each enemy
     for enemy, turn_lengths in sorted_results:
         median_turn_length = statistics.median(turn_lengths)
-        insights["Turn length"]["data"].append(
+        insights["Turn Length"]["data"].append(
             [enemy, median_turn_length, len(turn_lengths)])
 
     return insights
@@ -510,8 +511,8 @@ def upgraded_card_win_rate_analysis(runs: list[dict]) -> dict:
 
     insights = {
         "Card Upgrades": {
-            "description": "Analyzes upgrade frequency and win rates for cards.",
-            "headers": ["Card", "Amount Upgraded", "Win Rate when Upgraded", "General Win Rate"],
+            "description": "Card upgrade frequencies and effect on win rate",
+            "headers": ["Card", "Amount Upgraded", "Win Rate when Upgraded", "Overall Card Win Rate","Change When Upgraded"],
             "data": []
         }
     }
@@ -521,10 +522,17 @@ def upgraded_card_win_rate_analysis(runs: list[dict]) -> dict:
     for card, freq in sorted_analysis.items():
         if freq < 350:
             continue
-        upgrade_win_rate = make_ratio(upgrade_win_counts[card], upgrade_total_counts[card])
-        general_win_rate = make_ratio(card_win_counts[card], card_total_counts[card])
 
-        insights["Card Upgrades"]["data"].append([del_prefix(card), freq, upgrade_win_rate, general_win_rate])
+        # The general winrate for multi upgrades was showing as 0, this just makes it display the base card's winrate
+        base_card = re.sub(r'\+\d+$', '', card)
+
+        upgrade_win_rate = make_ratio(upgrade_win_counts[card], upgrade_total_counts[card])
+        general_win_rate = make_ratio(card_win_counts[base_card], card_total_counts[base_card])
+
+        win_rate_diff = float(upgrade_win_rate) - float(general_win_rate)
+        formatted_diff = f"+{win_rate_diff:.2f}" if win_rate_diff > 0 else f"{win_rate_diff:.2f}"
+
+        insights["Card Upgrades"]["data"].append([del_prefix(card), freq, upgrade_win_rate, general_win_rate,formatted_diff])
 
     return insights
 
@@ -562,8 +570,8 @@ def median_health_before_rest(runs: list[dict]) -> dict:
     # Create insights structure
     insights = {
         "Health before rest": {
-            "description": "Median health ratios before rest across different ascension levels.",
-            "headers": ["Ascension Level", "Median Health Before Rest"],
+            "description": "Median HP% before rest across different ascension levels",
+            "headers": ["Ascension Level", "Median HP% Before Rest"],
             "data": data
         }
     }
@@ -596,9 +604,9 @@ def smith_vs_rest_ratio(runs: list[dict]) -> dict:
 
     # Format into the insights structure
     insights = {
-        "SmithVsRest": {
-            "description": "Shows the ratio of smiths to rests at campsites.",
-            "headers": ["Ascension Level", "Number of Smiths", "Number of Rests", "Smith to Rest Ratio"],
+        "Smith Vs Rest": {
+            "description": "Smith-to-rest ratio at campsites",
+            "headers": ["Ascension Level", "Number of Smiths", "Number of Rests", "Smith-to-Rest Ratio"],
             "data": data
         }
     }
@@ -638,7 +646,7 @@ def gem_impact_on_win_rate(runs: list[dict]) -> dict:
 
     insights = {
         "Gem Impact on Win Rate": {
-            "description": "Shows win rates of runs with gems pack based on having gems slotted in or not.",
+            "description": "Win rate of runs with gems pack: gems slotted vs. no gems slotted",
             "headers": ["Condition", "Wins", "Total", "Win Rate"],
             "data": [
                 ["With Gems", wins_with_gems, total_runs_with_gems, win_rate_with_gems],
@@ -686,7 +694,7 @@ def gem_count_vs_win_rate(runs: list[dict]) -> dict:
     # Store the results in the desired structure
     insights = {
         "Gem Count vs Win Rate": {
-            "description": "Displays the win rate by number of socketed gems in runs with Gems pack.",
+            "description": "Win rate for runs with gems pack by number of gems slotted",
             "headers": ["Gem Count", "Wins", "Total", "Win Rate"],
             "data": results
         }
@@ -697,6 +705,7 @@ def gem_count_vs_win_rate(runs: list[dict]) -> dict:
 
 def win_rate_by_ascension_and_pack(runs: list[dict]) -> dict:
     stats = defaultdict(lambda: defaultdict(lambda: {'wins': 0, 'total': 0}))
+    overall_stats = defaultdict(lambda: {'wins': 0, 'total': 0})
 
     for run in runs:
         asc_level = run.get('ascension_level', 0)
@@ -705,31 +714,35 @@ def win_rate_by_ascension_and_pack(runs: list[dict]) -> dict:
 
         for pack in packs:
             stats[pack][asc_level]['total'] += 1
+            overall_stats[pack]['total'] += 1
             if victory:
                 stats[pack][asc_level]['wins'] += 1
+                overall_stats[pack]['wins'] += 1
 
     win_rate_by_pack = defaultdict(dict)
 
     for pack, asc_data in stats.items():
-        for asc_level, data in asc_data.items():
-            win_rate = make_ratio(data['wins'], data['total'])
-            win_rate_by_pack[pack][asc_level] = win_rate
+        if pack:
+            win_rate_by_pack[pack]['Overall'] = make_ratio(overall_stats[pack]['wins'], overall_stats[pack]['total'])
+            for asc_level, data in asc_data.items():
+                win_rate = make_ratio(data['wins'], data['total'])
+                win_rate_by_pack[pack][asc_level] = win_rate
+
+    all_asc_levels = [level for level in range(20, -1, -1)]
 
     insight = {
-        "Win rate by pack and asc": {
-            "description": "Win rates by pack and ascension level.",
-            "headers": ["Pack", "Ascension Level", "Win Rate"],
+        "Win Rate by Pack and Asc": {
+            "description": "Pack win rates across ascension levels",
+            "headers": ["Pack","Overall Win Rate"] + [f"A{level}" for level in all_asc_levels],
             "data": []
         }
     }
 
     for pack, asc_data in win_rate_by_pack.items():
-        if pack:
-            for asc_level in range(0, 21):
-                if asc_level in asc_data:
-                    insight["Win rate by pack and asc"]["data"].append([
-                        del_prefix(pack), asc_level, asc_data[asc_level]
-                    ])
+        row = [del_prefix(pack), asc_data.get('Overall', "N/A")]
+        for asc_level in all_asc_levels:
+            row.append(asc_data.get(asc_level, "N/A"))  # Use "N/A" if no data for this ascension level
+        insight["Win Rate by Pack and Asc"]["data"].append(row)
 
     return insight
 
@@ -772,9 +785,9 @@ def win_rate_deviation_between_asc(runs: list[dict]) -> dict:
     insights_data.sort(key=lambda x: float(x[3][:-1]), reverse=True)
 
     insights = {
-        "Win rate deviation between asc": {
-            "description": "Comparative win rates and deviation for packs between ascension level 0 and 20.",
-            "headers": ["Pack", "Asc 0 Win Rate", "Asc 20 Win Rate", "Deviation"],
+        "Pack Win Rate Difference Between A0 and A20": {
+            "description": "Difference in pack win rate between ascension 0 and ascension 20",
+            "headers": ["Pack", "Asc 0 Win Rate", "Asc 20 Win Rate", "Difference"],
             "data": insights_data
         }
     }
@@ -827,9 +840,9 @@ def win_rate_deviation_from_average_by_asc(runs: list[dict]) -> dict:
             ])
 
     insights = {
-        "Win rate deviation from average": {
-            "description": "Comparative win rates and deviations of packs against the average win rates for ascension levels 0 and 20.",
-            "headers": ["Pack", "Pack Asc 0 Win Rate", "Pack Asc 20 Win Rate", "Deviation from Avg Asc 0", "Deviation from Avg Asc 20"],
+        "Win Rate Deviation from Average": {
+            "description": "Win rates for each pack against the average win rate (across all packs) for ascension levels 0 and 20",
+            "headers": ["Pack", "Pack Asc 0 Win Rate", "Pack Asc 20 Win Rate", "Difference from Avg Asc 0", "Deviation from Avg Asc 20"],
             "data": insights_data
         }
     }
@@ -880,7 +893,7 @@ def calculate_card_pick_deviation(runs: list[dict], card_to_pack: dict, card_to_
 
     insights = {
         "Card Pick Deviations": {
-            "description": "Deviation of card pick rates from their pack averages.",
+            "description": "Deviation in card pick rate from the pack's average",
             "headers": ["Pack", "Card", "Pick Rate", "Pack Average", "Deviation"],
             "data": [
                 [del_prefix(card_to_pack[card]), del_prefix(card), f"{card_pick_rates[card] * 100:.2f}",
