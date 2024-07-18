@@ -196,7 +196,12 @@ def update_summary_sheet():
         sheet.values().update(
             spreadsheetId=SPREADSHEET_ID, range="Summary!A1",
             valueInputOption="USER_ENTERED", body=body).execute()
-
+        
+        # Color formatting
+        format_requests = []
+        format_requests = apply_summary_formatting(summary_sheet_id)
+        sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': format_requests}).execute()
+        
     except HttpError as err:
         print(err)
 
@@ -339,6 +344,137 @@ def delete_all_sheets_except_first(spreadsheet_id=SPREADSHEET_ID):
 
     print(f"Deleted {len(delete_requests)} sheet(s).")
 
+def apply_summary_formatting(sheet_id):
+    def format_section(bg_color, start_row, stop_row):
+        red, green, blue = [color / 255 if color > 1 else color for color in bg_color]
+        return [
+            {
+                'repeatCell': {
+                    'range': {
+                        'sheetId': sheet_id,
+                        'startRowIndex': start_row - 1,
+                        'endRowIndex': stop_row,
+                        'startColumnIndex': 0,
+                        'endColumnIndex': 2
+                    },
+                    'cell': {
+                        'userEnteredFormat': {
+                            'backgroundColor': {'red': red, 'green': green, 'blue': blue}
+                        }
+                    },
+                    'fields': 'userEnteredFormat.backgroundColor'
+                }
+            }
+        ]
+
+    sections = [
+        ([182, 215, 168], 1, 1),
+        ([217, 217, 217], 3, 3),
+        ([217, 210, 233], 4, 5),
+        ([201, 218, 248], 6, 9),
+        ([239, 239, 239], 10, 12),
+        ([252, 229, 205], 13, 14),
+        ([208, 224, 227], 15, 18),
+        ([230, 184, 175], 19, 20),
+        ([217, 210, 233], 21, 24)
+    ]
+
+    format_requests = []
+    for color, start, end in sections:
+        format_requests.extend(format_section(color, start, end))
+
+    # Add column formatting
+    format_requests.extend([
+        # Column 1 formatting: bold and size 13
+        {
+            'repeatCell': {
+                'range': {
+                    'sheetId': sheet_id,
+                    'startColumnIndex': 0,
+                    'endColumnIndex': 1
+                },
+                'cell': {
+                    'userEnteredFormat': {
+                        'textFormat': {
+                            'bold': True,
+                            'fontSize': 13
+                        }
+                    }
+                },
+                'fields': 'userEnteredFormat.textFormat(bold,fontSize)'
+            }
+        },
+        # Column 2 formatting: size 11, not bold
+        {
+            'repeatCell': {
+                'range': {
+                    'sheetId': sheet_id,
+                    'startColumnIndex': 1,
+                    'endColumnIndex': 2
+                },
+                'cell': {
+                    'userEnteredFormat': {
+                        'textFormat': {
+                            'fontSize': 11
+                        }
+                    }
+                },
+                'fields': 'userEnteredFormat.textFormat.fontSize'
+            }
+        },
+        # Set column 1 width to 400px
+        {
+            'updateDimensionProperties': {
+                'range': {
+                    'sheetId': sheet_id,
+                    'dimension': 'COLUMNS',
+                    'startIndex': 0,
+                    'endIndex': 1
+                },
+                'properties': {
+                    'pixelSize': 400
+                },
+                'fields': 'pixelSize'
+            }
+        },
+        # Set column 2 width to 750px
+        {
+            'updateDimensionProperties': {
+                'range': {
+                    'sheetId': sheet_id,
+                    'dimension': 'COLUMNS',
+                    'startIndex': 1,
+                    'endIndex': 2
+                },
+                'properties': {
+                    'pixelSize': 750
+                },
+                'fields': 'pixelSize'
+            }
+        },
+        # Set cell A3 to size 16 font
+        {
+            'repeatCell': {
+                'range': {
+                    'sheetId': sheet_id,
+                    'startRowIndex': 2,
+                    'endRowIndex': 3,
+                    'startColumnIndex': 0,
+                    'endColumnIndex': 1
+                },
+                'cell': {
+                    'userEnteredFormat': {
+                        'textFormat': {
+                            'fontSize': 16
+                        }
+                    }
+                },
+                'fields': 'userEnteredFormat.textFormat.fontSize'
+            }
+        }
+    ])
+
+    return format_requests
 
 if __name__ == "__main__":
     # Only for testing, should be called from main.py
