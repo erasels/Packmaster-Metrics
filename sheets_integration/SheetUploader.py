@@ -34,7 +34,12 @@ def update_insights(insights: dict):
 
             # Only prepare addSheet request if sheet does not exist.
             if sheet_name not in existing_sheets:
-                requests = [{'addSheet': {'properties': {'title': sheet_name}}}]
+                requests = [{'addSheet': {'properties': {'title': sheet_name,
+                                                         'gridProperties': {
+                                                             'rowCount': len(content['data'])+2,
+                                                             'columnCount': len(content['headers'])
+                                                             }
+                                                         }}}]
                 response = sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': requests}).execute()
                 # Find the new sheetId from the response.
                 new_sheet_id = response['replies'][0]['addSheet']['properties']['sheetId']
@@ -148,8 +153,6 @@ def update_insights(insights: dict):
                 spreadsheetId=SPREADSHEET_ID, range=f"{sheet_name}!A1",
                 valueInputOption="USER_ENTERED", body=body).execute()
             
-            # I had to add a 5s sleep here because I was getting rate limited, don't know if you have a higher limit
-            # time.sleep(5)
 
     except HttpError as err:
         print(err)

@@ -32,6 +32,8 @@ if __name__ == "__main__":
 
     all_data = mega_list_merge(date_to_metrics)
     del date_to_metrics
+    delete_all_sheets_except_first()
+
     update_insights(insights.count_win_rates_per_asc(all_data))
     update_insights(insights.win_rate_by_ascension_and_pack(all_data))
     update_insights(insights.count_pack_picks(all_data))
@@ -55,7 +57,7 @@ if __name__ == "__main__":
     update_insights(insights.count_enabled_expansion_packs(all_data))
 
     update_summary_sheet()
-    # delete_all_sheets_except_first()
+    
     
     del all_data
     gc.collect()
