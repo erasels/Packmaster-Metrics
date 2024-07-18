@@ -73,7 +73,7 @@ def count_enabled_expansion_packs(runs: list[dict]) -> dict:
 
 
 # Counts the number of times each pack was picked and prints the results.
-def count_pack_picks(runs: list[dict]) -> dict:
+def pack_pick_rate(runs: list[dict]) -> dict:
     picked_counts = Counter()
     not_picked_counts = Counter()
     result = []
@@ -136,7 +136,7 @@ def count_most_common_players(runs: list[dict]) -> dict:
     return insights
 
 
-def count_most_common_picked_hats(runs: list[dict]) -> dict:
+def hat_pick_rate(runs: list[dict]) -> dict:
     picked_hat_counts = Counter()
 
     for data_dict in runs:
@@ -161,7 +161,7 @@ def count_most_common_picked_hats(runs: list[dict]) -> dict:
     return insights
 
 
-def count_pack_victory_rate(runs: list[dict]) -> dict:
+def pack_win_rate(runs: list[dict]) -> dict:
     pack_wins = {}
     pack_runs = {}
 
@@ -198,7 +198,7 @@ def count_pack_victory_rate(runs: list[dict]) -> dict:
 
 
 # Count card picks of current run cards (counts upgraded cards seperately)
-def count_card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> dict:
+def card_pick_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> dict:
     picked_counts = Counter()
     not_picked_counts = Counter()
     result = []
@@ -288,7 +288,7 @@ def count_win_rates_per_asc(runs: list[dict]) -> dict:
     return insights
 
 
-def count_median_deck_sizes(runs: list[dict]) -> dict:
+def median_deck_sizes(runs: list[dict]) -> dict:
     # Create a dictionary to store deck sizes of victorious runs per ascension level
     ascension_deck_sizes = {}
     total_deck_sizes = []
@@ -331,7 +331,7 @@ def count_median_deck_sizes(runs: list[dict]) -> dict:
     return insights
 
 
-def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> dict:
+def card_win_rate(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> dict:
     # Create a dictionary to store the number of wins and total runs for each card
     card_stats = {}
 
@@ -380,7 +380,7 @@ def count_average_win_rate_per_card(runs: list[dict], card_to_pack: dict, card_t
 
 
 # This is bogus data for fun
-def count_win_rate_per_picked_hat(runs: list[dict]) -> dict:
+def hat_win_rate(runs: list[dict]) -> dict:
     # Create a dictionary to store the number of wins and total runs for each pickedHat
     picked_hat_stats = {}
 
@@ -422,7 +422,7 @@ def count_win_rate_per_picked_hat(runs: list[dict]) -> dict:
     return insights
 
 
-def count_median_turn_length_per_enemy(runs: list[dict]) -> dict:
+def median_turn_length_per_enemy(runs: list[dict]) -> dict:
     # Create a dictionary to store the turn lengths for each enemy
     enemy_turn_lengths = {}
 
@@ -847,7 +847,7 @@ def win_rate_deviation_from_average_by_asc(runs: list[dict]) -> dict:
 
 
 # Pick rate deviation of pack average by card (excluding special cards)
-def calculate_card_pick_deviation(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> dict:
+def card_pick_deviation(runs: list[dict], card_to_pack: dict, card_to_rarity: dict) -> dict:
     picked_counts = Counter()
     not_picked_counts = Counter()
     card_pick_rates = {}  # To store pick rates of each card

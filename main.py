@@ -1,9 +1,8 @@
 import gc
 
-from sheets_integration.SheetUploader import *
 from logic import insights
-from logic.results import print_insight_dict, write_insight_to_file
 from logic.storage import *
+from sheets_integration.SheetUploader import *
 
 # Global dictionary to store sublists based on file paths
 date_to_metrics = {}
@@ -24,7 +23,6 @@ if __name__ == "__main__":
         print(date_to_metrics.keys())
         save_data_to_pickle(data_file_path, date_to_metrics)
 
-
     print("Data is loaded.")
 
     pack_to_cards = load_data_from_json(os.path.join(data_path, "packCards.json"))
@@ -33,21 +31,22 @@ if __name__ == "__main__":
 
     all_data = mega_list_merge(date_to_metrics)
     del date_to_metrics
+
     delete_all_sheets_except_first()
 
     update_insights(insights.count_win_rates_per_asc(all_data))
     update_insights(insights.win_rate_by_ascension_and_pack(all_data))
-    update_insights(insights.count_pack_picks(all_data))
-    update_insights(insights.count_pack_victory_rate(all_data))
-    update_insights(insights.count_card_pick_rate(all_data, card_to_pack, card_to_rarity))
-    update_insights(insights.count_average_win_rate_per_card(all_data, card_to_pack, card_to_rarity))
+    update_insights(insights.pack_pick_rate(all_data))
+    update_insights(insights.pack_win_rate(all_data))
+    update_insights(insights.card_pick_rate(all_data, card_to_pack, card_to_rarity))
+    update_insights(insights.card_win_rate(all_data, card_to_pack, card_to_rarity))
     update_insights(insights.win_rate_deviation_between_asc(all_data))
     update_insights(insights.win_rate_deviation_from_average_by_asc(all_data))
-    update_insights(insights.calculate_card_pick_deviation(all_data, card_to_pack, card_to_rarity))
-    update_insights(insights.count_most_common_picked_hats(all_data))
-    update_insights(insights.count_win_rate_per_picked_hat(all_data))
-    update_insights(insights.count_median_deck_sizes(all_data))
-    update_insights(insights.count_median_turn_length_per_enemy(all_data))
+    update_insights(insights.card_pick_deviation(all_data, card_to_pack, card_to_rarity))
+    update_insights(insights.hat_pick_rate(all_data))
+    update_insights(insights.hat_win_rate(all_data))
+    update_insights(insights.median_deck_sizes(all_data))
+    update_insights(insights.median_turn_length_per_enemy(all_data))
     update_insights(insights.median_health_before_rest(all_data))
     update_insights(insights.smith_vs_rest_ratio(all_data))
     update_insights(insights.gem_impact_on_win_rate(all_data))
@@ -58,8 +57,6 @@ if __name__ == "__main__":
     update_insights(insights.count_enabled_expansion_packs(all_data))
 
     update_summary_sheet()
-    
-    
+
     del all_data
     gc.collect()
-
