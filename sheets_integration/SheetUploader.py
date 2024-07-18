@@ -38,7 +38,7 @@ def update_insights(insights: dict):
                 requests = [{'addSheet': {'properties': {'title': sheet_name,
                                                          'gridProperties': {
                                                              'rowCount': len(content['data']) + 2,
-                                                             'columnCount': len(content['headers'])
+                                                             'columnCount': len(content['headers']) + 1  # Adding additional column so description doesn't get cut off
                                                          }
                                                          }}}]
                 response = sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': requests}).execute()
@@ -69,7 +69,6 @@ def update_insights(insights: dict):
                         'cell': {
                             'userEnteredFormat': {
                                 'backgroundColor': {
-                                    # I like blue header better :3
                                     'red': 0.85,
                                     'green': 0.85,
                                     'blue': 1
@@ -135,9 +134,7 @@ def update_insights(insights: dict):
                     }
                 })
 
-            # This is to make the conditional formatting for the pack wr by asc, but it was so much code 
-            # I didn't want to have it be here in a conditional, so I moved it to a function
-            # I know this is kinda a jank way to handle it but ¯\_(ツ)_/¯
+            # This is to make the conditional formatting for the pack wr by asc, but it was so much code
             if content['headers'][0] == "Pack" and "Overall Win Rate" in content['headers'] and "A20" in content['headers']:
                 formatting_requests = pack_wr_by_asc_formatting(content, existing_sheets[sheet_name])
                 format_requests.extend(formatting_requests)
