@@ -38,7 +38,8 @@ def update_insights(insights: dict):
                 requests = [{'addSheet': {'properties': {'title': sheet_name,
                                                          'gridProperties': {
                                                              'rowCount': len(content['data']) + 2,
-                                                             'columnCount': len(content['headers']) + 1  # Adding additional column so description doesn't get cut off
+                                                             'columnCount': len(content['headers']) + 1
+                                                             # Adding additional column so description doesn't get cut off
                                                          }
                                                          }}}]
                 response = sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': requests}).execute()
@@ -173,9 +174,8 @@ def update_summary_sheet():
         else:
             summary_sheet_id = existing_sheets["Summary"]
 
-        # Prepare data to write to "Summary" sheet
-        timezone = ZoneInfo("Europe/Paris")
-        current_time = datetime.datetime.now(timezone).strftime("%Y/%m/%d %H:%M %Z")
+        # Prepare data to write to "Summary" shee
+        current_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         values = [
             [f"Last updated: {current_time}"],  # First row with the update time
             [],  # Second row is empty
@@ -196,12 +196,12 @@ def update_summary_sheet():
         sheet.values().update(
             spreadsheetId=SPREADSHEET_ID, range="Summary!A1",
             valueInputOption="USER_ENTERED", body=body).execute()
-        
+
         # Color formatting
         format_requests = []
         format_requests = apply_summary_formatting(summary_sheet_id)
         sheet.batchUpdate(spreadsheetId=SPREADSHEET_ID, body={'requests': format_requests}).execute()
-        
+
     except HttpError as err:
         print(err)
 
@@ -344,6 +344,7 @@ def delete_all_sheets_except_first(spreadsheet_id=SPREADSHEET_ID):
 
     print(f"Deleted {len(delete_requests)} sheet(s).")
 
+
 def apply_summary_formatting(sheet_id):
     def format_section(bg_color, start_row, stop_row):
         red, green, blue = [color / 255 if color > 1 else color for color in bg_color]
@@ -476,6 +477,7 @@ def apply_summary_formatting(sheet_id):
 
     return format_requests
 
+
 if __name__ == "__main__":
     # Only for testing, should be called from main.py
     test_data = {
@@ -488,5 +490,5 @@ if __name__ == "__main__":
             ]
         }
     }
-    update_insights(test_data)
-    # update_summary_sheet()
+    # update_insights(test_data)
+    update_summary_sheet()

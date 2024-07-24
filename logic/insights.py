@@ -1,9 +1,7 @@
-import statistics
 import re
+import statistics
 from collections import Counter
-from itertools import combinations
 from collections import defaultdict
-from typing import List, Dict, Tuple, Any
 
 from logic.transformations import *
 
