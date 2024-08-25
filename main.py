@@ -12,7 +12,7 @@ card_to_pack = {}
 if __name__ == "__main__":
     data_path = os.path.join(os.getcwd(), "data")
     metrics_path = os.path.join(data_path, "metrics")
-    data_file = "test_data.pkl"
+    data_file = "data.pkl"
     data_file_path = os.path.join(data_path, data_file)
 
     # Check if the data file exists to avoid reprocessing
