@@ -278,7 +278,7 @@ def pack_wr_by_asc_formatting(content: dict, sheet_id: int) -> list:
                 'endIndex': len(content['headers'])
             },
             'properties': {
-                'pixelSize': 50
+                'pixelSize': 52
             },
             'fields': 'pixelSize'
         }
