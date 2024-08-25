@@ -511,7 +511,7 @@ def upgraded_card_win_rate_analysis(runs: list[dict], card_to_pack: dict) -> dic
     insights = {
         "Card Upgrades": {
             "description": "Card upgrade frequencies and effect on win rate",
-            "headers": ["Pack","Card", "Amount Upgraded", "Win Rate when Upgraded", "Overall Card Win Rate","Change When Upgraded"],
+            "headers": ["Card", "Amount Upgraded", "Win Rate when Upgraded", "Overall Card Win Rate","Change When Upgraded"],
             "data": []
         }
     }
@@ -530,8 +530,8 @@ def upgraded_card_win_rate_analysis(runs: list[dict], card_to_pack: dict) -> dic
 
         win_rate_diff = float(upgrade_win_rate) - float(general_win_rate)
         formatted_diff = f"+{win_rate_diff:.2f}" if win_rate_diff > 0 else f"{win_rate_diff:.2f}"
-
-        insights["Card Upgrades"]["data"].append([del_prefix(card_to_pack.get(card)),del_prefix(card), freq, upgrade_win_rate, general_win_rate,formatted_diff])
+    
+        insights["Card Upgrades"]["data"].append([del_prefix(card), freq, upgrade_win_rate, general_win_rate,formatted_diff])
 
     return insights
 

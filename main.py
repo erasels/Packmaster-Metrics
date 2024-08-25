@@ -51,7 +51,7 @@ if __name__ == "__main__":
     update_insights(insights.smith_vs_rest_ratio(all_data))
     update_insights(insights.gem_impact_on_win_rate(all_data))
     update_insights(insights.gem_count_vs_win_rate(all_data))
-    update_insights(insights.upgraded_card_win_rate_analysis(all_data))
+    update_insights(insights.upgraded_card_win_rate_analysis(all_data, card_to_pack))
     update_insights(insights.sum_filtered_packs(all_data))
     update_insights(insights.count_most_common_players(all_data))
     update_insights(insights.count_enabled_expansion_packs(all_data))
