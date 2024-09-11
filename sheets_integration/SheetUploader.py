@@ -340,7 +340,8 @@ def delete_all_sheets_except_first(spreadsheet_id=SPREADSHEET_ID):
     body = {
         'requests': delete_requests
     }
-    sheet.batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
+    if delete_requests:
+        sheet.batchUpdate(spreadsheetId=spreadsheet_id, body=body).execute()
 
     print(f"Deleted {len(delete_requests)} sheet(s).")
 
