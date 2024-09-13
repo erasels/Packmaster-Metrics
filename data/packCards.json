@@ -1357,5 +1357,17 @@
         "anniv5:HallOfMirrors",
         "anniv5:MagicCylinder",
         "anniv5:NowYouDont"
+    ],
+    "anniv5:DarkflamePactPack": [
+        "anniv5:Demonspark",
+        "anniv5:LostElegy",
+        "anniv5:FromAsh",
+        "anniv5:SearingDelusion",
+        "anniv5:TheCalmBefore",
+        "anniv5:DarkflameBarrier",
+        "anniv5:DarkRecollection",
+        "anniv5:AnamnesisFlare",
+        "anniv5:FormlessMemory",
+        "anniv5:Requiescat"
     ]
 }

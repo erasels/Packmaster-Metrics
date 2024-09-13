@@ -2302,5 +2302,15 @@
     "anniv5:SeeMe": "Uncommon",
     "anniv5:WellWrittenScript": "Uncommon",
     "anniv5:GrandOpening": "Rare",
-    "anniv5:Backstitch": "Common"
+    "anniv5:Backstitch": "Common",
+    "anniv5:Demonspark":"Common",
+    "anniv5:LostElegy":"Common",
+    "anniv5:FromAsh":"Common",
+    "anniv5:SearingDelusion":"Uncommon"
+    "anniv5:TheCalmBefore":"Uncommon",
+    "anniv5:DarkflameBarrier":"Uncommon",
+    "anniv5:DarkRecollection":"Uncommon",
+    "anniv5:AnamnesisFlare":"Rare",
+    "anniv5:FormlessMemory":"Rare",
+    "anniv5:Requiescat":"Rare"
 }
