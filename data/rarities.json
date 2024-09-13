@@ -1886,7 +1886,7 @@
     "anniv5:GoldenPick": "Common",
     "anniv5:GreyBargain": "Common",
     "anniv5:GrievousIgnite": "Common",
-    "anniv5:Guile": "Common",
+    "anniv5:Guile": "Uncommon",
     "anniv5:CrescentSweep": "Common",
     "anniv5:IronFlesh": "Common",
     "anniv5:Lariat": "Common",
@@ -1961,7 +1961,7 @@
     "anniv5:Bzzzzz": "Uncommon",
     "anniv5:CallOfTheGrave": "Uncommon",
     "anniv5:CharacterDevelopment": "Uncommon",
-    "anniv5:CheapShot": "Uncommon",
+    "anniv5:CheapShot": "Common",
     "anniv5:ChillingCurse": "Uncommon",
     "anniv5:Chronoboost": "Uncommon",
     "anniv5:Cloud": "Uncommon",
@@ -2312,5 +2312,6 @@
     "anniv5:DarkRecollection":"Uncommon",
     "anniv5:AnamnesisFlare":"Rare",
     "anniv5:FormlessMemory":"Rare",
-    "anniv5:Requiescat":"Rare"
+    "anniv5:Requiescat":"Rare",
+    "anniv5:PrepareStrike": "Uncommon"
 }

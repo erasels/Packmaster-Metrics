@@ -1257,7 +1257,8 @@
         "anniv5:BrutalStrikes",
         "anniv5:SinisterConcoction",
         "anniv5:ColdCalculated",
-        "anniv5:DaggerRush"
+        "anniv5:DaggerRush",
+        "anniv5:PrepareStrike"
     ],
     "anniv5:SneckoPack": [
         "anniv5:Gulp",
