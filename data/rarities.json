@@ -2313,5 +2313,15 @@
     "anniv5:AnamnesisFlare":"Rare",
     "anniv5:FormlessMemory":"Rare",
     "anniv5:Requiescat":"Rare",
-    "anniv5:PrepareStrike": "Uncommon"
+    "anniv5:PrepareStrike": "Uncommon",
+    "anniv5:Prevail": "Rare",
+    "anniv5:DigIn": "Rare",
+    "anniv5:Shrapnel": "Uncommon",
+    "anniv5:ShellForge": "Uncommon",
+    "anniv5:Logistics": "Common",
+    "anniv5:ThinkTwice": "Uncommon",
+    "anniv5:DefensePlanning": "Common",
+    "anniv5:BallisticStrike": "Rare",
+    "anniv5:Suppress": "Common",
+    "anniv5:Shelling": "Uncommon"
 }

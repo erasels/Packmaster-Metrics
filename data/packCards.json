@@ -1370,5 +1370,17 @@
         "anniv5:AnamnesisFlare",
         "anniv5:FormlessMemory",
         "anniv5:Requiescat"
+    ],
+    "anniv5:SiegePack": [
+        "anniv5:Prevail",
+        "anniv5:DigIn",
+        "anniv5:Shrapnel",
+        "anniv5:ShellForge",
+        "anniv5:Logistics",
+        "anniv5:ThinkTwice",
+        "anniv5:DefensePlanning",
+        "anniv5:BallisticStrike",
+        "anniv5:Suppress",
+        "anniv5:Shelling"
     ]
 }
